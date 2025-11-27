@@ -4,19 +4,65 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/Header";
 import { Colors } from "../../constants/Colors";
 
 export default function ProfileScreen() {
-  const [userName] = useState("Usuário");
-  const [userEmail] = useState("usuario@exemplo.com");
+  const [userName, setUserName] = useState("Usuário");
+  const [userEmail, setUserEmail] = useState("usuario@exemplo.com");
   const [redacoesCorrigidas] = useState(0);
   const [notaMedia] = useState(0);
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const email = await AsyncStorage.getItem("@user_email");
+      const name = await AsyncStorage.getItem("@user_name");
+
+      if (email) setUserEmail(email);
+      if (name) setUserName(name);
+    } catch (error) {
+      console.error("Erro ao carregar dados do usuário:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair da Conta",
+      "Tem certeza que deseja sair?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Sair",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem("@user_logged");
+              await AsyncStorage.removeItem("@user_email");
+              await AsyncStorage.removeItem("@user_name");
+              router.replace("/login");
+            } catch (error) {
+              Alert.alert("Erro", "Erro ao fazer logout. Tente novamente.");
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
@@ -168,7 +214,11 @@ export default function ProfileScreen() {
         </View>
 
         {/* Botão de Sair */}
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          activeOpacity={0.8}
+          onPress={handleLogout}
+        >
           <Ionicons name="log-out-outline" size={24} color="#FF6B6B" />
           <Text style={styles.logoutButtonText}>Sair da Conta</Text>
         </TouchableOpacity>
@@ -206,7 +256,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
     borderWidth: 3,
-    borderColor: Colors.primary,
+    borderColor: "#2a2a2a",
   },
   userName: {
     color: Colors.text,
