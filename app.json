@@ -25,6 +25,11 @@
         "backgroundColor": "#1a1a1a",
         "barStyle": "light-content"
       },
+      "navigationBar": {
+        "backgroundColor": "#0f0f0f",
+        "barStyle": "light-content",
+        "visible": true
+      },
       "package": "com.anonymous.atena"
     },
     "web": {

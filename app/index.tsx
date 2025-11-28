@@ -2,7 +2,7 @@ import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { Colors } from "../constants/Colors";
-import { storage } from "./utils/config";
+import { storage } from "../utils/config";
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,8 +39,8 @@ export default function Index() {
   }
 
   return isLoggedIn ? (
-    <Redirect href="/(tabs)/add" />
+    <Redirect href="/_routes/(tabs)/add" />
   ) : (
-    <Redirect href="/login" />
+    <Redirect href="/_routes/(tabs)/add" />
   );
 }

@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import Header from "../../components/Header";
-import { Colors } from "../../constants/Colors";
-import { Feedback } from "../utils/feedback";
+import Header from "../../../components/Header";
+import { Colors } from "../../../constants/Colors";
+import { Feedback } from "../../../utils/feedback";
 
 export default function FeedbackScreen() {
   const router = useRouter();

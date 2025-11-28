@@ -1,11 +1,11 @@
-import { Text, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '../../components/Header';
-import { Colors } from '../../constants/Colors';
+import { Text, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "../../../components/Header";
+import { Colors } from "../../../constants/Colors";
 
 export default function HistoryScreen() {
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Header />
 
       <ScrollView style={styles.content}>
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: Colors.textSecondary,
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
 });

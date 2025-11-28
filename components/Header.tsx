@@ -10,7 +10,7 @@ export default function Header() {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const handleProfilePress = () => {
-    router.push("/(tabs)/profile");
+    router.push("/_routes/(tabs)/profile");
   };
 
   const handleMenuPress = () => {
@@ -18,7 +18,7 @@ export default function Header() {
   };
 
   const handleLogoPress = () => {
-    router.push("/(tabs)/add");
+    router.push("/_routes/(tabs)/add");
   };
 
   const handleLogout = async () => {
@@ -35,12 +35,12 @@ export default function Header() {
 
   const handleFeedback = () => {
     setMenuVisible(false);
-    router.push("/misc/feedback");
+    router.push("/_routes/misc/feedback");
   };
 
   const handleSettings = () => {
     setMenuVisible(false);
-    router.push("/misc/config"); // ou outra rota de configurações
+    router.push("/_routes/misc/config"); // ou outra rota de configurações
   };
 
   return (

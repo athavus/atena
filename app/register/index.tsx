@@ -67,7 +67,7 @@ export default function RegisterScreen() {
         Alert.alert("Sucesso", "Conta criada com sucesso!", [
           {
             text: "OK",
-            onPress: () => router.replace("/(tabs)/add"),
+            onPress: () => router.replace("/_routes/(tabs)/add"),
           },
         ]);
       } catch (error) {

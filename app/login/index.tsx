@@ -45,7 +45,7 @@ export default function LoginScreen() {
         await AsyncStorage.setItem("@user_name", email.split("@")[0]);
 
         setIsLoading(false);
-        router.replace("/(tabs)/add");
+        router.replace("/_routes/(tabs)/add");
       } catch (error) {
         setIsLoading(false);
         Alert.alert("Erro", "Erro ao fazer login. Tente novamente.");

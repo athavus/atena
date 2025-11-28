@@ -11,8 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Header from "../../components/Header";
-import { Colors } from "../../constants/Colors";
+import Header from "../../../components/Header";
+import { Colors } from "../../../constants/Colors";
 
 export default function ProfileScreen() {
   const [userName, setUserName] = useState("Usuário");
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
   profileHeader: {
     alignItems: "center",

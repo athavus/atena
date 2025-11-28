@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import Header from "../../components/Header";
-import { Colors } from "../../constants/Colors";
+import Header from "../../../components/Header";
+import { Colors } from "../../../constants/Colors";
 
 type InputType = "texto" | "imagem";
 
