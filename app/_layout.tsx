@@ -22,11 +22,24 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="register" options={{ headerShown: false }} />
-        <Stack.Screen name="misc" options={{ headerShown: false }} />
         <Stack.Screen
-          name="(tabs)"
+          name="(routes)/login/index"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="(routes)/register/index"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="(routes)/misc/config"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="(routes)/misc/feedback"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="(routes)/(tabs)"
           options={{ headerShown: false, presentation: "modal" }}
         />
       </Stack>

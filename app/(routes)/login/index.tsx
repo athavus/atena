@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Colors } from "../../constants/Colors";
+import { Colors } from "../../../constants/Colors";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -45,7 +45,7 @@ export default function LoginScreen() {
         await AsyncStorage.setItem("@user_name", email.split("@")[0]);
 
         setIsLoading(false);
-        router.replace("/_routes/(tabs)/add");
+        router.replace("/(routes)/(tabs)/add");
       } catch (error) {
         setIsLoading(false);
         Alert.alert("Erro", "Erro ao fazer login. Tente novamente.");
@@ -63,7 +63,7 @@ export default function LoginScreen() {
           {/* Logo e Título */}
           <View style={styles.header}>
             <Image
-              source={require("../../assets/images/logo-atena.png")}
+              source={require("../../../assets/images/logo-atena.png")}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -171,7 +171,7 @@ export default function LoginScreen() {
               style={styles.registerButton}
               activeOpacity={0.8}
               disabled={isLoading}
-              onPress={() => router.push("/register")}
+              onPress={() => router.push("/(routes)/register")}
             >
               <Text style={styles.registerButtonText}>Criar nova conta</Text>
             </TouchableOpacity>

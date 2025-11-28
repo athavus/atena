@@ -53,7 +53,7 @@ export default function ProfileScreen() {
               await AsyncStorage.removeItem("@user_logged");
               await AsyncStorage.removeItem("@user_email");
               await AsyncStorage.removeItem("@user_name");
-              router.replace("/login");
+              router.replace("/(routes)/login");
             } catch (error) {
               Alert.alert("Erro", "Erro ao fazer logout. Tente novamente.");
             }

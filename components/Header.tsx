@@ -10,7 +10,7 @@ export default function Header() {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const handleProfilePress = () => {
-    router.push("/_routes/(tabs)/profile");
+    router.push("/(routes)/(tabs)/profile");
   };
 
   const handleMenuPress = () => {
@@ -18,7 +18,7 @@ export default function Header() {
   };
 
   const handleLogoPress = () => {
-    router.push("/_routes/(tabs)/add");
+    router.push("/(routes)/(tabs)/add");
   };
 
   const handleLogout = async () => {
@@ -27,7 +27,7 @@ export default function Header() {
       await AsyncStorage.removeItem("@user_email");
       await AsyncStorage.removeItem("@user_name");
       setMenuVisible(false);
-      router.replace("/login");
+      router.replace("/(routes)/login");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
@@ -35,12 +35,12 @@ export default function Header() {
 
   const handleFeedback = () => {
     setMenuVisible(false);
-    router.push("/_routes/misc/feedback");
+    router.push("/(routes)/misc/feedback");
   };
 
   const handleSettings = () => {
     setMenuVisible(false);
-    router.push("/_routes/misc/config"); // ou outra rota de configurações
+    router.push("/(routes)/misc/config"); // ou outra rota de configurações
   };
 
   return (

@@ -29,7 +29,7 @@ export default function ConfigScreen() {
         onPress: async () => {
           try {
             await storage.clearUserData();
-            router.replace("/login");
+            router.replace("/(routes)/login");
           } catch (error) {
             Alert.alert("Erro", "Erro ao fazer logout");
           }

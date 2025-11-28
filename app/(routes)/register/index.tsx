@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Colors } from "../../constants/Colors";
+import { Colors } from "../../../constants/Colors";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -67,7 +67,7 @@ export default function RegisterScreen() {
         Alert.alert("Sucesso", "Conta criada com sucesso!", [
           {
             text: "OK",
-            onPress: () => router.replace("/_routes/(tabs)/add"),
+            onPress: () => router.replace("/(routes)/(tabs)/add"),
           },
         ]);
       } catch (error) {
@@ -101,7 +101,7 @@ export default function RegisterScreen() {
             {/* Logo e Título */}
             <View style={styles.header}>
               <Image
-                source={require("../../assets/images/logo-atena.png")}
+                source={require("../../../assets/images/logo-atena.png")}
                 style={styles.logoImage}
                 resizeMode="contain"
               />
