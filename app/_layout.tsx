@@ -21,12 +21,9 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(routes)/login" options={{ headerShown: false }} />
         <Stack.Screen
-          name="(routes)/login/index"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="(routes)/register/index"
+          name="(routes)/register"
           options={{ headerShown: false }}
         />
         <Stack.Screen
