@@ -21,10 +21,6 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "userInterfaceStyle": "dark",
-      "statusBar": {
-        "backgroundColor": "#1a1a1a",
-        "barStyle": "light-content"
-      },
       "navigationBar": {
         "backgroundColor": "#0f0f0f",
         "barStyle": "light-content",
@@ -45,6 +41,13 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#1a1a1a"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O aplicativo precisa de acesso às suas fotos para processar redações.",
+          "cameraPermission": "O aplicativo precisa de acesso à câmera para tirar fotos de redações."
         }
       ]
     ],

@@ -19,8 +19,10 @@ import { Colors } from "../../constants/Colors";
 export default function ReviewScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const [textoExtraido, setTextoExtraido] = useState(params.texto as string || "");
-  const [titulo, setTitulo] = useState(params.titulo as string || "");
+  const [textoExtraido, setTextoExtraido] = useState(
+    (params.texto as string) || "",
+  );
+  const [titulo, setTitulo] = useState((params.titulo as string) || "");
 
   const handleConfirmar = () => {
     if (textoExtraido.trim().length === 0) {
@@ -66,7 +68,8 @@ export default function ReviewScreen() {
 
           <View style={styles.infoSection}>
             <Text style={styles.infoText}>
-              Revise o texto extraído da imagem. Você pode editar qualquer parte que não esteja correta.
+              Revise o texto extraído da imagem. Você pode editar qualquer parte
+              que não esteja correta.
             </Text>
           </View>
 
@@ -83,7 +86,10 @@ export default function ReviewScreen() {
 
           <View style={styles.textSection}>
             <Text style={styles.sectionTitle}>Texto Extraído</Text>
-            <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.scrollContainer}
+              showsVerticalScrollIndicator={false}
+            >
               <TextInput
                 style={styles.textInput}
                 placeholder="Texto extraído aparecerá aqui..."
@@ -94,7 +100,9 @@ export default function ReviewScreen() {
                 textAlignVertical="top"
               />
             </ScrollView>
-            <Text style={styles.charCount}>{textoExtraido.length} caracteres</Text>
+            <Text style={styles.charCount}>
+              {textoExtraido.length} caracteres
+            </Text>
           </View>
 
           <View style={styles.actionButtons}>
@@ -111,7 +119,8 @@ export default function ReviewScreen() {
               style={[
                 styles.actionButton,
                 styles.confirmButton,
-                textoExtraido.trim().length === 0 && styles.confirmButtonDisabled,
+                textoExtraido.trim().length === 0 &&
+                  styles.confirmButtonDisabled,
               ]}
               onPress={handleConfirmar}
               disabled={textoExtraido.trim().length === 0}
@@ -120,15 +129,20 @@ export default function ReviewScreen() {
               <Ionicons
                 name="checkmark"
                 size={20}
-                color={textoExtraido.trim().length > 0 ? Colors.background : Colors.textSecondary}
+                color={
+                  textoExtraido.trim().length > 0
+                    ? Colors.background
+                    : Colors.textSecondary
+                }
               />
               <Text
                 style={[
                   styles.confirmButtonText,
-                  textoExtraido.trim().length === 0 && styles.confirmButtonTextDisabled,
+                  textoExtraido.trim().length === 0 &&
+                    styles.confirmButtonTextDisabled,
                 ]}
               >
-                Confirmar e Corrigir
+                Confirmar
               </Text>
             </TouchableOpacity>
           </View>

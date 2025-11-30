@@ -18,7 +18,6 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
           statusBarAnimation: "slide",
-          statusBarTranslucent: true,
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
