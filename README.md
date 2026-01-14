@@ -1,50 +1,111 @@
-# Welcome to your Expo app 👋
+# Atena App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Atena é um assistente pessoal de redação alimentado por IA, desenvolvido para ajudar estudantes a aprimorarem suas habilidades de escrita para o ENEM e outros vestibulares. O aplicativo oferece feedback instantâneo sobre coesão, coerência, gramática e estrutura.
 
-## Get started
+> [!NOTE]
+> **Versão Atual**: Text-Focus. Nesta versão, priorizamos a entrada de texto direta para garantir máxima precisão no feedback da IA.
 
-1. Install dependencies
+---
 
+
+## Funcionalidades
+
+- **Correção Inteligente**: Análise detalhada baseada nas competências do ENEM.
+- **Histórico de Redações**: Acompanhe sua evolução ao longo do tempo.
+- **Interface Moderna**: Design dark mode premium e minimalista.
+- **Feedback Detalhado**: Dicas específicas para cada parágrafo do seu texto.
+
+---
+
+## Arquitetura do Sistema
+
+O Atena foi construído utilizando as tecnologias mais modernas do ecossistema mobile.
+
+### Fluxo de Navegação
+
+```mermaid
+graph TD
+    Splash[Tela de Splash] --> Auth{Autenticado?}
+    Auth -- Não --> Login[Tela de Login]
+    Auth -- Sim --> Tabs[Navegação por Abas]
+    
+    Login --> Register[Criar Conta]
+    Register --> Tabs
+    
+    Tabs --> Home[Minhas Redações]
+    Tabs --> Add[Nova Redação]
+    Tabs --> Profile[Perfil/Configurações]
+    
+    Add --> Results[Análise da IA]
+    Home --> Results
+```
+
+### Tecnologias Utilizadas
+
+- **Core**: [React Native](https://reactnative.dev/)
+- **Framework**: [Expo](https://expo.dev/)
+- **Roteamento**: [Expo Router](https://docs.expo.dev/router/introduction/) (Tipo: File-based)
+- **Estado Local**: React Hooks (useState, useEffect)
+- **Persistência**: AsyncStorage
+- **Estilização**: StyleSheet (Vanilla CSS-in-JS)
+
+---
+
+## Como Começar
+
+### Pré-requisitos
+
+- Node.js (v18 ou superior)
+- npm ou yarn
+- Expo Go (no seu dispositivo móvel)
+
+### Instalação
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/atena.git
+   ```
+
+2. Instale as dependências:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. Inicie o servidor de desenvolvimento:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Estrutura de Pastas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+atena/
+├── app/                # Rotas e telas (Expo Router)
+│   ├── (routes)/       # Sub-rotas dinâmicas
+│   │   ├── (tabs)/     # Navegação por abas
+│   │   └── ...         # Telas de login/registro
+│   └── _layout.tsx     # Configuração global da UI
+├── assets/             # Imagens, fontes e screenshots
+├── components/         # Componentes React reutilizáveis
+├── constants/          # Cores, temas e dimensões
+└── utils/              # Funções auxiliares e mocks
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Contribuindo
 
-To learn more about developing your project with Expo, look at the following resources:
+Sinta-se à vontade para abrir issues ou enviar pull requests. Para mudanças maiores, por favor, abra uma issue primeiro para discutir o que você gostaria de mudar.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Licença
 
-Join our community of developers creating universal apps.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+Feito com dedicacao pela equipe Atena.
+
