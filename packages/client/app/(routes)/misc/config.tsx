@@ -14,6 +14,7 @@ import Header from "../../../components/Header";
 import { Colors } from "../../../constants/Colors";
 import { Feedback } from "../../../utils/feedback";
 import { storage } from "../../../utils/config";
+import * as WebBrowser from "expo-web-browser";
 
 export default function ConfigScreen() {
   const router = useRouter();
@@ -108,22 +109,20 @@ export default function ConfigScreen() {
             style={styles.menuItem}
             onPress={async () => {
               try {
-                // In development/web, this works if served.
                 // In production, this should point to the deployed URL.
-                // For now, using the symbolic link path assumption for web/dev.
-                // A more robust solution would be an environment variable.
-                const url = "https://atena-app.com/privacy-terms"; // Placeholder or localhost
-                // For this specific task asking for a symbolic link 'while not on vercel',
-                // we assume they might access it via the web build or purely local.
-                // If running locally on web:
-                await WebBrowser.openBrowserAsync("http://localhost:8081/privacy-terms");
+                const url = "https://atena-privacy-terms.vercel.app/";
+                await WebBrowser.openBrowserAsync(url);
               } catch (e) {
                 Alert.alert("Erro", "Não foi possível abrir os termos.");
               }
             }}
           >
             <View style={styles.menuItemLeft}>
-              <Ionicons name="document-text-outline" size={24} color={Colors.text} />
+              <Ionicons
+                name="document-text-outline"
+                size={24}
+                color={Colors.text}
+              />
               <Text style={styles.menuItemText}>Termos e Privacidade</Text>
             </View>
             <Ionicons
