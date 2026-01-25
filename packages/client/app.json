@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "atena",
+    "name": "ATENA",
     "slug": "atena",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "atena",
+    "scheme": "atenaapp",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.atena",

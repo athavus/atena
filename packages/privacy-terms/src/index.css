@@ -1,0 +1,81 @@
+:root {
+  font-family: 'Merriweather', 'Times New Roman', serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #ffffff;
+  /* Colors.text */
+  background-color: #1a1a1a;
+  /* Colors.background */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2.5em;
+  line-height: 1.1;
+  color: #4a9eff;
+  /* Colors.primary */
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: 1.8em;
+  color: #ffffff;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+p {
+  color: #cccccc;
+  /* Slightly softer white for body text */
+  margin-bottom: 1em;
+}
+
+.card {
+  background-color: #2a2a2a;
+  /* Colors.cardBackground */
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #444444;
+  /* Colors.border */
+}
+
+a {
+  font-weight: 500;
+  color: #4a9eff;
+  /* Colors.primary */
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: light) {
+
+  /* Enforce dark mode even if system is light, to match app */
+  :root {
+    color: #ffffff;
+    background-color: #1a1a1a;
+  }
+}
