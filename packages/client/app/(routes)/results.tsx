@@ -9,10 +9,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/Header";
 import { Colors } from "../../constants/Colors";
+import { api, RedacaoResult, RedacaoStatus } from "../../utils/api";
 
 interface Competencia {
   id: number;
@@ -23,90 +25,111 @@ interface Competencia {
   parabens: string;
 }
 
+const COMPETENCIAS_DESC = [
+  "Demonstrar domínio da modalidade escrita formal da Língua Portuguesa.",
+  "Compreender a proposta de redação e aplicar conceitos das várias áreas de conhecimento.",
+  "Selecionar, relacionar, organizar e interpretar informações, fatos, opiniões e argumentos.",
+  "Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação.",
+  "Elaborar proposta de intervenção para o problema abordado, respeitando os direitos humanos.",
+];
+
 export default function ResultsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [competencias, setCompetencias] = useState<Competencia[]>([]);
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [redacao, setRedacao] = useState<RedacaoResult | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Dados simulados das competências - em produção viria da API
-  useEffect(() => {
-    setIsLoading(true);
+  // Função para converter resultado da API para formato de competências
+  const converterResultadoParaCompetencias = (resultado: RedacaoResult): Competencia[] => {
+    if (!resultado.resultado_json?.competencias) {
+      return [];
+    }
 
-    // Simular processamento da redação (2 segundos)
-    setTimeout(() => {
-      const competenciasSimuladas: Competencia[] = [
-      {
-        id: 1,
-        titulo: "Competência 1",
-        nota: 180,
-        descricao: "Demonstrar domínio da modalidade escrita formal da Língua Portuguesa.",
-        melhorias: [
-          "Evite contrações informais como 'pra' em vez de 'para'",
-          "Use conectivos mais variados para melhorar a coesão textual",
-          "Preste atenção na concordância verbal e nominal"
-        ],
-        parabens: ""
-      },
-      {
-        id: 2,
-        titulo: "Competência 2",
-        nota: 160,
-        descricao: "Compreender a proposta de redação e aplicar conceitos das várias áreas de conhecimento.",
-        melhorias: [
-          "Desenvolva mais o tema com argumentos mais aprofundados",
-          "Inclua referências a diferentes áreas do conhecimento",
-          "Melhore a estrutura argumentativa com teses mais claras"
-        ],
-        parabens: ""
-      },
-      {
-        id: 3,
-        titulo: "Competência 3",
-        nota: 200,
-        descricao: "Selecionar, relacionar, organizar e interpretar informações, fatos, opiniões e argumentos.",
-        melhorias: [],
-        parabens: "Parabéns! Você demonstrou excelente habilidade em organizar e interpretar informações!"
-      },
-      {
-        id: 4,
-        titulo: "Competência 4",
-        nota: 170,
-        descricao: "Demonstrar conhecimento dos mecanismos linguísticos necessários para a construção da argumentação.",
-        melhorias: [
-          "Use uma maior variedade vocabular",
-          "Incorpore figuras de linguagem quando apropriado",
-          "Melhore o uso de pronomes e referências textuais"
-        ],
-        parabens: ""
-      },
-      {
-        id: 5,
-        titulo: "Competência 5",
-        nota: 150,
-        descricao: "Elaborar proposta de intervenção para o problema abordado, respeitando os direitos humanos.",
-        melhorias: [
-          "Desenvolva uma proposta de intervenção mais concreta e viável",
-          "Considere os aspectos práticos da implementação",
-          "Inclua medidas de avaliação da proposta"
-        ],
-        parabens: ""
+    return resultado.resultado_json.competencias.map((comp, index) => ({
+      id: comp.competencia,
+      titulo: `Competência ${comp.competencia}`,
+      nota: comp.nota,
+      descricao: COMPETENCIAS_DESC[comp.competencia - 1] || "",
+      melhorias: comp.analise_critica 
+        ? comp.analise_critica.split("\n").filter(m => m.trim().length > 0)
+        : [],
+      parabens: comp.nota === 200 
+        ? `Parabéns! Você demonstrou excelente habilidade na ${comp.competencia}ª competência!`
+        : "",
+    }));
+  };
+
+  // Função para buscar status da redação
+  const buscarRedacao = async (redacaoId: string) => {
+    try {
+      const id = parseInt(redacaoId);
+      const resultado = await api.obterRedacao(id);
+      setRedacao(resultado);
+
+      // Se a correção foi concluída, converter e parar polling
+      if (resultado.status === RedacaoStatus.CONCLUIDO) {
+        const comps = converterResultadoParaCompetencias(resultado);
+        setCompetencias(comps);
+        setIsLoading(false);
+        
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+
+        // Animação de entrada
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }).start();
+      } else if (resultado.status === RedacaoStatus.ERRO) {
+        setIsLoading(false);
+        Alert.alert("Erro", "Ocorreu um erro ao processar sua redação. Tente novamente.");
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
       }
-    ];
+    } catch (error) {
+      console.error("Erro ao buscar redação:", error);
+      setIsLoading(false);
+      Alert.alert("Erro", "Não foi possível buscar o status da redação.");
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    }
+  };
 
-    setCompetencias(competenciasSimuladas);
-    setIsLoading(false);
+  useEffect(() => {
+    const redacaoId = params.redacaoId as string;
+    
+    if (!redacaoId) {
+      Alert.alert("Erro", "ID da redação não encontrado.");
+      router.back();
+      return;
+    }
 
-    // Animação de entrada
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-    }, 2000);
-  }, [fadeAnim]);
+    // Buscar imediatamente
+    buscarRedacao(redacaoId);
+
+    // Configurar polling a cada 3 segundos
+    pollingIntervalRef.current = setInterval(() => {
+      buscarRedacao(redacaoId);
+    }, 3000);
+
+    // Limpar intervalo ao desmontar
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [params.redacaoId]);
 
   const toggleExpanded = (id: number) => {
     const newExpanded = new Set(expandedItems);
@@ -118,7 +141,9 @@ export default function ResultsScreen() {
     setExpandedItems(newExpanded);
   };
 
-  const notaTotal = competencias.reduce((total, comp) => total + comp.nota, 0);
+  const notaTotal = redacao?.resultado_json?.nota_final 
+    ? redacao.resultado_json.nota_final 
+    : competencias.reduce((total, comp) => total + comp.nota, 0);
 
   const handleNovaRedacao = () => {
     router.push("/(routes)/(tabs)/add");
@@ -146,8 +171,16 @@ export default function ResultsScreen() {
         <Header />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>Analisando sua redação...</Text>
-          <Text style={styles.loadingSubtext}>Isso pode levar alguns segundos</Text>
+          <Text style={styles.loadingText}>
+            {redacao?.status === RedacaoStatus.PROCESSANDO 
+              ? "Processando sua redação..." 
+              : "Aguardando processamento..."}
+          </Text>
+          <Text style={styles.loadingSubtext}>
+            {redacao?.status === RedacaoStatus.PROCESSANDO
+              ? "Isso pode levar alguns segundos"
+              : "Sua redação está na fila de processamento"}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -172,7 +205,9 @@ export default function ResultsScreen() {
 
           <View style={styles.tituloSection}>
             <Text style={styles.tituloLabel}>Título:</Text>
-            <Text style={styles.tituloTexto}>{params.titulo || "Redação sem título"}</Text>
+            <Text style={styles.tituloTexto}>
+              {redacao?.tema || (params.titulo as string) || "Redação sem título"}
+            </Text>
           </View>
 
           {/* Nota Geral */}
@@ -191,9 +226,11 @@ export default function ResultsScreen() {
           </View>
 
           {/* Competências */}
-          <Text style={styles.competenciasTitle}>Análise por Competência</Text>
+          {competencias.length > 0 && (
+            <>
+              <Text style={styles.competenciasTitle}>Análise por Competência</Text>
 
-          {competencias.map((competencia) => (
+              {competencias.map((competencia) => (
             <View key={competencia.id} style={styles.competenciaCard}>
               <TouchableOpacity
                 style={styles.competenciaHeader}
@@ -248,16 +285,22 @@ export default function ResultsScreen() {
               )}
             </View>
           ))}
+            </>
+          )}
 
           {/* Resumo Geral */}
-          <View style={styles.resumoSection}>
-            <Text style={styles.resumoTitle}>Resumo Geral</Text>
-            <Text style={styles.resumoText}>
-              Sua redação demonstrou um bom domínio da linguagem, mas há oportunidades de melhoria
-              na profundidade dos argumentos e na elaboração de propostas de intervenção mais concretas.
-              Continue praticando para alcançar notas ainda maiores!
-            </Text>
-          </View>
+          {competencias.length > 0 && (
+            <View style={styles.resumoSection}>
+              <Text style={styles.resumoTitle}>Resumo Geral</Text>
+              <Text style={styles.resumoText}>
+                {redacao?.resultado_json?.competencias 
+                  ? redacao.resultado_json.competencias
+                      .map(c => c.justificativa)
+                      .join(" ")
+                  : "Sua redação demonstrou um bom domínio da linguagem, mas há oportunidades de melhoria na profundidade dos argumentos e na elaboração de propostas de intervenção mais concretas. Continue praticando para alcançar notas ainda maiores!"}
+              </Text>
+            </View>
+          )}
 
           {/* Botão de Ação */}
           <TouchableOpacity

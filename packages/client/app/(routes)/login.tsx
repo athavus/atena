@@ -15,6 +15,9 @@ import { useState } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
+import { api } from "../../utils/api";
+import { storage, Config } from "../../utils/config";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -36,21 +39,23 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
-    // Simulação de login (sem backend)
-    setTimeout(async () => {
-      try {
-        // Salvar dados do usuário no AsyncStorage
-        await AsyncStorage.setItem("@user_logged", "true");
-        await AsyncStorage.setItem("@user_email", email);
-        await AsyncStorage.setItem("@user_name", email.split("@")[0]);
+    try {
+      // Fazer login na API
+      await api.login(email, password);
+      
+      // Salvar dados do usuário no AsyncStorage
+      await storage.setUserData(email, email.split("@")[0]);
+      await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
 
-        setIsLoading(false);
-        router.replace("/(routes)/(tabs)/add");
-      } catch (error) {
-        setIsLoading(false);
-        Alert.alert("Erro", "Erro ao fazer login. Tente novamente.");
-      }
-    }, 1500);
+      setIsLoading(false);
+      router.replace("/(routes)/(tabs)/add");
+    } catch (error) {
+      setIsLoading(false);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Erro ao fazer login. Verifique suas credenciais e tente novamente.";
+      Alert.alert("Erro", errorMessage);
+    }
   };
 
   return (
@@ -206,13 +211,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: Colors.text,
-    fontSize: 32,
-    fontWeight: "bold",
+    ...Fonts.styles.display,
     marginBottom: 8,
   },
   subtitle: {
     color: Colors.textSecondary,
-    fontSize: 16,
+    ...Fonts.styles.body,
   },
   form: {
     width: "100%",
@@ -222,8 +226,8 @@ const styles = StyleSheet.create({
   },
   label: {
     color: Colors.text,
-    fontSize: 14,
-    fontWeight: "600",
+    ...Fonts.styles.caption,
+    fontWeight: Fonts.weights.semiBold,
     marginBottom: 8,
   },
   inputWrapper: {
@@ -271,8 +275,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#000",
-    fontSize: 16,
-    fontWeight: "bold",
+    ...Fonts.styles.button,
   },
   divider: {
     flexDirection: "row",

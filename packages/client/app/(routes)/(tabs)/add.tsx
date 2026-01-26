@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,32 +11,55 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../../components/Header";
 import { Colors } from "../../../constants/Colors";
+import { Fonts } from "../../../constants/Fonts";
+import { api } from "../../../utils/api";
 
 export default function AddScreen() {
   const router = useRouter();
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  const handleSubmit = async () => {
+    if (!titulo.trim() || !texto.trim()) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos");
+      return;
+    }
 
+    setIsLoading(true);
 
+    try {
+      // Enviar redação para a API
+      const response = await api.criarRedacao({
+        tema: titulo,
+        texto_redacao: texto,
+      });
 
-  const handleSubmit = () => {
-    router.push({
-      pathname: "/(routes)/results",
-      params: {
-        titulo: titulo,
-        texto: texto,
-        tipo: "texto",
-      },
-    });
+      // Navegar para a tela de resultados com o ID da redação
+      router.push({
+        pathname: "/(routes)/results",
+        params: {
+          redacaoId: response.id.toString(),
+          titulo: titulo,
+        },
+      });
 
-    // Limpar após envio
-    setTitulo("");
-    setTexto("");
+      // Limpar após envio
+      setTitulo("");
+      setTexto("");
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Erro ao enviar redação. Tente novamente.";
+      Alert.alert("Erro", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const podeEnviar =
@@ -92,25 +116,34 @@ export default function AddScreen() {
             <TouchableOpacity
               style={[
                 styles.submitButton,
-                !podeEnviar && styles.submitButtonDisabled,
+                (!podeEnviar || isLoading) && styles.submitButtonDisabled,
               ]}
               onPress={handleSubmit}
-              disabled={!podeEnviar}
+              disabled={!podeEnviar || isLoading}
               activeOpacity={0.8}
             >
-              <Ionicons
-                name="send"
-                size={20}
-                color={podeEnviar ? Colors.background : Colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.submitButtonText,
-                  !podeEnviar && styles.submitButtonTextDisabled,
-                ]}
-              >
-                Enviar para Correção
-              </Text>
+              {isLoading ? (
+                <>
+                  <ActivityIndicator size="small" color={Colors.background} />
+                  <Text style={styles.submitButtonText}>Enviando...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons
+                    name="send"
+                    size={20}
+                    color={podeEnviar ? Colors.background : Colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.submitButtonText,
+                      !podeEnviar && styles.submitButtonTextDisabled,
+                    ]}
+                  >
+                    Enviar para Correção
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -146,8 +179,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: Colors.text,
-    fontSize: 15,
-    fontWeight: "600",
+    ...Fonts.styles.subheading,
     marginBottom: 10,
   },
   titleInput: {

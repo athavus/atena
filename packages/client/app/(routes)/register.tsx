@@ -16,6 +16,9 @@ import { useState } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "../../constants/Colors";
+import { Fonts } from "../../constants/Fonts";
+import { api } from "../../utils/api";
+import { storage, Config } from "../../utils/config";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -55,26 +58,31 @@ export default function RegisterScreen() {
 
     setIsLoading(true);
 
-    // Simulação de registro (sem backend)
-    setTimeout(async () => {
-      try {
-        // Salvar dados do usuário no AsyncStorage
-        await AsyncStorage.setItem("@user_logged", "true");
-        await AsyncStorage.setItem("@user_email", email);
-        await AsyncStorage.setItem("@user_name", name);
+    try {
+      // Criar conta na API
+      await api.register({ email, password });
+      
+      // Fazer login automaticamente após registro
+      await api.login(email, password);
+      
+      // Salvar dados do usuário no AsyncStorage
+      await storage.setUserData(email, name);
+      await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
 
-        setIsLoading(false);
-        Alert.alert("Sucesso", "Conta criada com sucesso!", [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(routes)/(tabs)/add"),
-          },
-        ]);
-      } catch (error) {
-        setIsLoading(false);
-        Alert.alert("Erro", "Erro ao criar conta. Tente novamente.");
-      }
-    }, 1500);
+      setIsLoading(false);
+      Alert.alert("Sucesso", "Conta criada com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/(routes)/(tabs)/add"),
+        },
+      ]);
+    } catch (error) {
+      setIsLoading(false);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Erro ao criar conta. Tente novamente.";
+      Alert.alert("Erro", errorMessage);
+    }
   };
 
   return (
@@ -308,8 +316,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: Colors.text,
-    fontSize: 28,
-    fontWeight: "bold",
+    ...Fonts.styles.heading,
     marginBottom: 8,
   },
   subtitle: {

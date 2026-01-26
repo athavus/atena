@@ -8,9 +8,13 @@ export const Config = {
     USER_NAME: "@user_name",
   },
 
-  // API (futuro)
+  // API
   API: {
-    BASE_URL: "https://api.atena.com.br/v1",
+    // Para desenvolvimento local, use: "http://localhost:8000"
+    // Para produção, use: "https://api.atena.com.br"
+    BASE_URL: __DEV__ 
+      ? "http://localhost:8000"  // Desenvolvimento local
+      : "https://api.atena.com.br",  // Produção
   },
 
   // App
