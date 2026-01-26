@@ -133,18 +133,6 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
             <View style={styles.menuItemLeft}>
-              <Ionicons name="shield-outline" size={24} color={Colors.text} />
-              <Text style={styles.menuItemText}>Privacidade</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-            <View style={styles.menuItemLeft}>
               <Ionicons
                 name="help-circle-outline"
                 size={24}
@@ -172,38 +160,6 @@ export default function ProfileScreen() {
                 color={Colors.text}
               />
               <Text style={styles.menuItemText}>Sobre o Atena</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-            <View style={styles.menuItemLeft}>
-              <Ionicons
-                name="document-text-outline"
-                size={24}
-                color={Colors.text}
-              />
-              <Text style={styles.menuItemText}>Termos de Uso</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-            <View style={styles.menuItemLeft}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={24}
-                color={Colors.text}
-              />
-              <Text style={styles.menuItemText}>Política de Privacidade</Text>
             </View>
             <Ionicons
               name="chevron-forward"
