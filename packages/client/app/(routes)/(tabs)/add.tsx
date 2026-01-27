@@ -47,7 +47,7 @@ export default function AddScreen() {
             "atena_draft",
             JSON.stringify({ titulo, texto }),
           );
-        } catch (e) {}
+        } catch (e) { }
       };
       saveDraft();
     }
@@ -82,7 +82,7 @@ export default function AddScreen() {
             );
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     };
     checkDraft();
   }, []);
@@ -172,7 +172,7 @@ export default function AddScreen() {
     texto.length <= MAX_TEXTO_LENGTH;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Header />
 
       <KeyboardAvoidingView
@@ -212,8 +212,8 @@ export default function AddScreen() {
                   style={[
                     styles.countBadge,
                     titulo.length > 0 &&
-                      titulo.length < MIN_TITULO_LENGTH &&
-                      styles.countBadgeError,
+                    titulo.length < MIN_TITULO_LENGTH &&
+                    styles.countBadgeError,
                   ]}
                 >
                   {titulo.length}/{MAX_TITULO_LENGTH}
@@ -223,8 +223,8 @@ export default function AddScreen() {
                 style={[
                   styles.titleInput,
                   titulo.length > 0 &&
-                    titulo.length < MIN_TITULO_LENGTH &&
-                    styles.inputError,
+                  titulo.length < MIN_TITULO_LENGTH &&
+                  styles.inputError,
                 ]}
                 placeholder="Digite o título da sua redação..."
                 placeholderTextColor={Colors.textSecondary}
@@ -248,8 +248,8 @@ export default function AddScreen() {
                     style={[
                       styles.countBadge,
                       texto.length > 0 &&
-                        texto.length < MIN_TEXTO_LENGTH &&
-                        styles.countBadgeError,
+                      texto.length < MIN_TEXTO_LENGTH &&
+                      styles.countBadgeError,
                     ]}
                   >
                     {texto.length}/{MAX_TEXTO_LENGTH}
@@ -259,8 +259,8 @@ export default function AddScreen() {
                   style={[
                     styles.textInput,
                     texto.length > 0 &&
-                      texto.length < MIN_TEXTO_LENGTH &&
-                      styles.inputError,
+                    texto.length < MIN_TEXTO_LENGTH &&
+                    styles.inputError,
                   ]}
                   placeholder="Digite ou cole o texto da sua redação aqui (mínimo 300 caracteres)..."
                   placeholderTextColor={Colors.textSecondary}

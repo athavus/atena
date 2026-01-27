@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { Platform } from "react-native";
 import { Config } from "./config";
 
 // Tipos para as respostas da API
@@ -146,6 +147,23 @@ async function request<T>(
   }
 }
 
+/**
+ * Função auxiliar para preparar arquivos para o FormData
+ * No Web, precisa ser um Blob real. No Mobile, o objeto com URI.
+ */
+async function createFormDataFile(uri: string, name: string, type: string) {
+  if (Platform.OS === "web") {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return new File([blob], name, { type });
+  }
+  return {
+    uri,
+    name,
+    type,
+  } as any;
+}
+
 // API Service
 export const api = {
   // Autenticação
@@ -233,12 +251,9 @@ export const api = {
     const url = `${Config.API.BASE_URL}/profile/photo`;
 
     const formData = new FormData();
-    // No React Native, campos de arquivo no FormData precisam de um objeto especial
-    formData.append("file", {
-      uri,
-      name: "profile.jpg",
-      type: "image/jpeg",
-    } as any);
+    // Prepara o arquivo de forma compatível (Web/Mobile)
+    const file = await createFormDataFile(uri, "profile.jpg", "image/jpeg");
+    formData.append("file", file);
 
     const response = await fetch(url, {
       method: "POST",
@@ -281,11 +296,8 @@ export const api = {
     const url = `${Config.API.BASE_URL}/api/v1/redacoes/extract-text`;
 
     const formData = new FormData();
-    formData.append("file", {
-      uri,
-      name: "handwriting.jpg",
-      type: "image/jpeg",
-    } as any);
+    const file = await createFormDataFile(uri, "handwriting.jpg", "image/jpeg");
+    formData.append("file", file);
 
     const response = await fetch(url, {
       method: "POST",

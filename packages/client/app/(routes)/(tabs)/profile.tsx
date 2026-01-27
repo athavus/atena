@@ -42,7 +42,11 @@ export default function ProfileScreen() {
       // Se não tiver o ID (ex: login antigo), busca da API
       if (!data.id) {
         const user = await api.getMe();
-        await storage.setUserData(user.email, user.email.split("@")[0], user.id);
+        await storage.setUserData(
+          user.email,
+          user.email.split("@")[0],
+          user.id,
+        );
         data = await storage.getUserData();
       }
 
@@ -51,7 +55,9 @@ export default function ProfileScreen() {
       if (data.id) {
         setUserId(data.id);
         // Tenta carregar a foto do servidor (adiciona timestamp para evitar cache)
-        setProfilePhoto(`${Config.API.BASE_URL}/profile/photo/${data.id}?t=${Date.now()}`);
+        setProfilePhoto(
+          `${Config.API.BASE_URL}/profile/photo/${data.id}?t=${Date.now()}`,
+        );
       }
     } catch (error) {
       console.error("Erro ao carregar dados do usuário:", error);
@@ -95,7 +101,10 @@ export default function ProfileScreen() {
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Precisamos de acesso à sua galeria para escolher uma foto.");
+      Alert.alert(
+        "Permissão necessária",
+        "Precisamos de acesso à sua galeria para escolher uma foto.",
+      );
       return;
     }
 
@@ -114,7 +123,10 @@ export default function ProfileScreen() {
   const handleTakePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão necessária", "Precisamos de acesso à sua câmera para tirar uma foto.");
+      Alert.alert(
+        "Permissão necessária",
+        "Precisamos de acesso à sua câmera para tirar uma foto.",
+      );
       return;
     }
 
@@ -135,7 +147,9 @@ export default function ProfileScreen() {
     try {
       await api.uploadProfilePhoto(uri);
       // Atualiza a foto localmente
-      setProfilePhoto(`${Config.API.BASE_URL}/profile/photo/${userId}?t=${Date.now()}`);
+      setProfilePhoto(
+        `${Config.API.BASE_URL}/profile/photo/${userId}?t=${Date.now()}`,
+      );
       Alert.alert("Sucesso", "Foto de perfil atualizada!");
     } catch (error) {
       console.error("Erro ao enviar foto:", error);
@@ -161,9 +175,9 @@ export default function ProfileScreen() {
             } catch (error) {
               Alert.alert("Erro", "Não foi possível remover a foto.");
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
@@ -171,7 +185,7 @@ export default function ProfileScreen() {
     Alert.alert(
       "Exportar Dados",
       "Seus dados (redações e resultados) foram exportados com sucesso em formato JSON.",
-      [{ text: "OK" }]
+      [{ text: "OK" }],
     );
   };
 
@@ -182,14 +196,20 @@ export default function ProfileScreen() {
       [
         { text: "Tirar Foto", onPress: handleTakePhoto },
         { text: "Escolher da Galeria", onPress: handlePickImage },
-        profilePhoto ? { text: "Remover Foto", onPress: handleRemovePhoto, style: "destructive" } : { text: "Cancelar", style: "cancel" },
-        { text: "Cancelar", style: "cancel" }
-      ].filter(Boolean) as any
+        profilePhoto
+          ? {
+              text: "Remover Foto",
+              onPress: handleRemovePhoto,
+              style: "destructive",
+            }
+          : { text: "Cancelar", style: "cancel" },
+        { text: "Cancelar", style: "cancel" },
+      ].filter(Boolean) as any,
     );
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Header />
 
       <ScrollView
@@ -268,14 +288,17 @@ export default function ProfileScreen() {
             />
           </TouchableOpacity>
 
-
           <TouchableOpacity
             style={styles.menuItem}
             activeOpacity={0.7}
             onPress={handleExportData}
           >
             <View style={styles.menuItemLeft}>
-              <Ionicons name="cloud-download-outline" size={24} color={Colors.text} />
+              <Ionicons
+                name="cloud-download-outline"
+                size={24}
+                color={Colors.text}
+              />
               <Text style={styles.menuItemText}>Exportar Dados</Text>
             </View>
             <Ionicons
@@ -342,7 +365,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* Versão */}
-        <Text style={styles.versionText}>Versão 0.6.0</Text>
+        <Text style={styles.versionText}>Versão 0.7.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
