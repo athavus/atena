@@ -1,59 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constants/Colors";
 
 export default function Header() {
   const router = useRouter();
-  const [menuVisible, setMenuVisible] = useState(false);
 
   const handleProfilePress = () => {
     router.push("/(routes)/(tabs)/profile");
-  };
-
-  const handleMenuPress = () => {
-    setMenuVisible((prev) => !prev);
   };
 
   const handleLogoPress = () => {
     router.push("/(routes)/(tabs)/add");
   };
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("@user_logged");
-      await AsyncStorage.removeItem("@user_email");
-      await AsyncStorage.removeItem("@user_name");
-      setMenuVisible(false);
-      router.replace("/(routes)/login");
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-    }
-  };
-
-  const handleFeedback = () => {
-    setMenuVisible(false);
-    router.push("/(routes)/misc/feedback");
-  };
-
-  const handleSettings = () => {
-    setMenuVisible(false);
-    router.push("/(routes)/misc/config"); // ou outra rota de configurações
-  };
-
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={handleMenuPress}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="menu" size={24} color={Colors.text} />
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.logoContainer}
           onPress={handleLogoPress}
@@ -79,59 +42,6 @@ export default function Header() {
           />
         </TouchableOpacity>
       </View>
-
-      {menuVisible && (
-        <View style={styles.menu}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={handleSettings}
-          >
-            <View style={styles.menuItemLeft}>
-              <Ionicons name="settings-outline" size={22} color={Colors.text} />
-              <Text style={styles.menuItemText}>Configurações</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={18}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={handleFeedback}
-          >
-            <View style={styles.menuItemLeft}>
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={22}
-                color={Colors.text}
-              />
-              <Text style={styles.menuItemText}>Feedback</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={18}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.menuItem, styles.logoutItem]}
-            activeOpacity={0.7}
-            onPress={handleLogout}
-          >
-            <View style={styles.menuItemLeft}>
-              <Ionicons name="log-out-outline" size={22} color="#FF6B6B" />
-              <Text style={[styles.menuItemText, styles.logoutText]}>
-                Sair da Conta
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
@@ -145,14 +55,17 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center", // Center content
     backgroundColor: Colors.cardBackground,
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 30,
+    position: "relative", // For absolute positioning of children
   },
   iconButton: {
     padding: 4,
+    position: "absolute",
+    right: 20,
   },
   logoContainer: {
     flexDirection: "row",

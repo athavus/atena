@@ -42,7 +42,7 @@ export default function LoginScreen() {
     try {
       // Fazer login na API
       await api.login(email, password);
-      
+
       // Salvar dados do usuário no AsyncStorage
       await storage.setUserData(email, email.split("@")[0]);
       await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
@@ -51,8 +51,8 @@ export default function LoginScreen() {
       router.replace("/(routes)/(tabs)/add");
     } catch (error) {
       setIsLoading(false);
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "Erro ao fazer login. Verifique suas credenciais e tente novamente.";
       Alert.alert("Erro", errorMessage);
     }
@@ -137,15 +137,6 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* Link Esqueci a Senha */}
-            <TouchableOpacity
-              style={styles.forgotPassword}
-              activeOpacity={0.7}
-              disabled={isLoading}
-            >
-              <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
-            </TouchableOpacity>
 
             {/* Botão de Login */}
             <TouchableOpacity

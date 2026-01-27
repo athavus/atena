@@ -53,8 +53,8 @@ export default function AddScreen() {
       setTitulo("");
       setTexto("");
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "Erro ao enviar redação. Tente novamente.";
       Alert.alert("Erro", errorMessage);
     } finally {
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   content: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 32,
     paddingTop: 20,
     paddingBottom: 20,
   },

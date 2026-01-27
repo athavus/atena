@@ -20,6 +20,7 @@ export default function HistoryScreen() {
   const [redacoes, setRedacoes] = useState<RedacaoResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [sortBy, setSortBy] = useState<"date" | "score">("date");
 
   const carregarRedacoes = async () => {
     try {
@@ -43,18 +44,7 @@ export default function HistoryScreen() {
   };
 
   const getStatusColor = (status: RedacaoStatus) => {
-    switch (status) {
-      case RedacaoStatus.CONCLUIDO:
-        return "#4CAF50";
-      case RedacaoStatus.PROCESSANDO:
-        return "#FF9800";
-      case RedacaoStatus.PENDENTE:
-        return "#2196F3";
-      case RedacaoStatus.ERRO:
-        return "#F44336";
-      default:
-        return Colors.textSecondary;
-    }
+    return "#FFFFFF";
   };
 
   const getStatusText = (status: RedacaoStatus) => {
@@ -114,52 +104,82 @@ export default function HistoryScreen() {
           </View>
         ) : (
           <>
-            <Text style={styles.title}>Minhas Redações</Text>
-            {redacoes.map((redacao) => (
-              <TouchableOpacity
-                key={redacao.id}
-                style={styles.redacaoCard}
-                onPress={() => handleRedacaoPress(redacao)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.redacaoHeader}>
-                  <Text style={styles.redacaoTema} numberOfLines={2}>
-                    {redacao.tema}
-                  </Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: getStatusColor(redacao.status) + "20" },
-                    ]}
+            <View style={styles.headerColumn}>
+              <Text style={styles.title}>Minhas Redações</Text>
+
+              <View style={styles.sortWrapper}>
+                <Text style={styles.sortLabel}>Ordenar por:</Text>
+                <View style={styles.sortContainer}>
+                  <TouchableOpacity
+                    style={[styles.sortButton, sortBy === "date" && styles.sortButtonActive]}
+                    onPress={() => setSortBy("date")}
                   >
-                    <Text
-                      style={[
-                        styles.statusText,
-                        { color: getStatusColor(redacao.status) },
-                      ]}
-                    >
-                      {getStatusText(redacao.status)}
+                    <Text style={[styles.sortButtonText, sortBy === "date" && styles.sortButtonTextActive]}>
+                      Mais Recentes
                     </Text>
-                  </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.sortButton, sortBy === "score" && styles.sortButtonActive]}
+                    onPress={() => setSortBy("score")}
+                  >
+                    <Text style={[styles.sortButtonText, sortBy === "score" && styles.sortButtonTextActive]}>
+                      Maior Nota
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                {redacao.status === RedacaoStatus.CONCLUIDO &&
-                  redacao.resultado_json?.nota_final && (
-                    <View style={styles.notaContainer}>
-                      <Text style={styles.notaLabel}>Nota:</Text>
-                      <Text style={styles.notaValue}>
-                        {redacao.resultado_json.nota_final} / 1000
+              </View>
+            </View>
+
+            {redacoes
+              .sort((a, b) => {
+                if (sortBy === "score") {
+                  const scoreA = a.resultado_json?.nota_final || 0;
+                  const scoreB = b.resultado_json?.nota_final || 0;
+                  return scoreB - scoreA;
+                }
+                // Date sort (assuming ID is proxy for date since we don't have created_at in interface yet, or just existing order)
+                return b.id - a.id;
+              })
+              .map((redacao) => (
+                <TouchableOpacity
+                  key={redacao.id}
+                  style={styles.redacaoCard}
+                  onPress={() => handleRedacaoPress(redacao)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.redacaoHeader}>
+                    <Text style={styles.redacaoTema} numberOfLines={2}>
+                      {redacao.tema}
+                    </Text>
+                    <View style={styles.statusBadge}>
+                      <Text
+                        style={[
+                          styles.statusText,
+                          { color: getStatusColor(redacao.status) },
+                        ]}
+                      >
+                        {getStatusText(redacao.status)}
                       </Text>
                     </View>
-                  )}
-                <View style={styles.redacaoFooter}>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color={Colors.textSecondary}
-                  />
-                </View>
-              </TouchableOpacity>
-            ))}
+                  </View>
+                  {redacao.status === RedacaoStatus.CONCLUIDO &&
+                    redacao.resultado_json?.nota_final && (
+                      <View style={styles.notaContainer}>
+                        <Text style={styles.notaLabel}>Nota:</Text>
+                        <Text style={styles.notaValue}>
+                          {redacao.resultado_json.nota_final} / 1000
+                        </Text>
+                      </View>
+                    )}
+                  <View style={styles.redacaoFooter}>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={20}
+                      color={Colors.textSecondary}
+                    />
+                  </View>
+                </TouchableOpacity>
+              ))}
           </>
         )}
       </ScrollView>
@@ -235,9 +255,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#FFFFFF40", // Subtle white border
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
   },
   statusText: {
     fontSize: 12,
@@ -261,5 +283,42 @@ const styles = StyleSheet.create({
   redacaoFooter: {
     alignItems: "flex-end",
     marginTop: 8,
+  },
+  headerColumn: {
+    marginBottom: 20,
+  },
+  sortWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  sortLabel: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    marginRight: 12,
+  },
+  sortContainer: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  sortButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  sortButtonActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
+  },
+  sortButtonText: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  sortButtonTextActive: {
+    color: "#000000", // Black text on white button (primary is white)
+    fontWeight: "bold",
   },
 });

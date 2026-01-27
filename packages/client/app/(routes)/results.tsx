@@ -41,7 +41,7 @@ export default function ResultsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [redacao, setRedacao] = useState<RedacaoResult | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingIntervalRef = useRef<any>(null);
 
   // Função para converter resultado da API para formato de competências
   const converterResultadoParaCompetencias = (resultado: RedacaoResult): Competencia[] => {
@@ -54,10 +54,10 @@ export default function ResultsScreen() {
       titulo: `Competência ${comp.competencia}`,
       nota: comp.nota,
       descricao: COMPETENCIAS_DESC[comp.competencia - 1] || "",
-      melhorias: comp.analise_critica 
+      melhorias: comp.analise_critica
         ? comp.analise_critica.split("\n").filter(m => m.trim().length > 0)
         : [],
-      parabens: comp.nota === 200 
+      parabens: comp.nota === 200
         ? `Parabéns! Você demonstrou excelente habilidade na ${comp.competencia}ª competência!`
         : "",
     }));
@@ -75,7 +75,7 @@ export default function ResultsScreen() {
         const comps = converterResultadoParaCompetencias(resultado);
         setCompetencias(comps);
         setIsLoading(false);
-        
+
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
           pollingIntervalRef.current = null;
@@ -108,7 +108,7 @@ export default function ResultsScreen() {
 
   useEffect(() => {
     const redacaoId = params.redacaoId as string;
-    
+
     if (!redacaoId) {
       Alert.alert("Erro", "ID da redação não encontrado.");
       router.back();
@@ -141,8 +141,8 @@ export default function ResultsScreen() {
     setExpandedItems(newExpanded);
   };
 
-  const notaTotal = redacao?.resultado_json?.nota_final 
-    ? redacao.resultado_json.nota_final 
+  const notaTotal = redacao?.resultado_json?.nota_final
+    ? redacao.resultado_json.nota_final
     : competencias.reduce((total, comp) => total + comp.nota, 0);
 
   const handleNovaRedacao = () => {
@@ -154,15 +154,11 @@ export default function ResultsScreen() {
   };
 
   const getNotaColor = (nota: number) => {
-    if (nota >= 180) return "#4CAF50"; // Verde
-    if (nota >= 140) return "#FF9800"; // Laranja
-    return "#F44336"; // Vermelho
+    return "#FFFFFF";
   };
 
   const getNotaBackground = (nota: number) => {
-    if (nota >= 180) return "#4CAF5020";
-    if (nota >= 140) return "#FF980020";
-    return "#F4433620";
+    return "transparent";
   };
 
   if (isLoading) {
@@ -172,8 +168,8 @@ export default function ResultsScreen() {
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>
-            {redacao?.status === RedacaoStatus.PROCESSANDO 
-              ? "Processando sua redação..." 
+            {redacao?.status === RedacaoStatus.PROCESSANDO
+              ? "Processando sua redação..."
               : "Aguardando processamento..."}
           </Text>
           <Text style={styles.loadingSubtext}>
@@ -219,7 +215,7 @@ export default function ResultsScreen() {
               <View
                 style={[
                   styles.notaGeralProgress,
-                  { width: `${(notaTotal / 1000) * 100}%`, backgroundColor: getNotaColor(notaTotal) }
+                  { width: `${(notaTotal / 1000) * 100}%`, backgroundColor: "#FFFFFF" }
                 ]}
               />
             </View>
@@ -231,60 +227,60 @@ export default function ResultsScreen() {
               <Text style={styles.competenciasTitle}>Análise por Competência</Text>
 
               {competencias.map((competencia) => (
-            <View key={competencia.id} style={styles.competenciaCard}>
-              <TouchableOpacity
-                style={styles.competenciaHeader}
-                onPress={() => toggleExpanded(competencia.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.competenciaInfo}>
-                  <Text style={styles.competenciaTitulo}>{competencia.titulo}</Text>
-                  <Text style={styles.competenciaDescricao} numberOfLines={2}>
-                    {competencia.descricao}
-                  </Text>
-                </View>
-                <View style={styles.competenciaScore}>
-                  <Text style={[styles.competenciaNota, { color: getNotaColor(competencia.nota) }]}>
-                    {competencia.nota}
-                  </Text>
-                  <Ionicons
-                    name={expandedItems.has(competencia.id) ? "chevron-up" : "chevron-down"}
-                    size={20}
-                    color={Colors.textSecondary}
-                  />
-                </View>
-              </TouchableOpacity>
-
-              {expandedItems.has(competencia.id) && (
-                <View style={styles.competenciaExpanded}>
-                  <View style={[styles.notaBadge, { backgroundColor: getNotaBackground(competencia.nota) }]}>
-                    <Text style={[styles.notaBadgeText, { color: getNotaColor(competencia.nota) }]}>
-                      {competencia.nota}/200 pontos
-                    </Text>
-                  </View>
-
-                  {competencia.nota === 200 && competencia.parabens && (
-                    <View style={styles.parabensSection}>
-                      <Ionicons name="trophy" size={24} color="#FFD700" />
-                      <Text style={styles.parabensText}>{competencia.parabens}</Text>
+                <View key={competencia.id} style={styles.competenciaCard}>
+                  <TouchableOpacity
+                    style={styles.competenciaHeader}
+                    onPress={() => toggleExpanded(competencia.id)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.competenciaInfo}>
+                      <Text style={styles.competenciaTitulo}>{competencia.titulo}</Text>
+                      <Text style={styles.competenciaDescricao} numberOfLines={2}>
+                        {competencia.descricao}
+                      </Text>
                     </View>
-                  )}
+                    <View style={styles.competenciaScore}>
+                      <Text style={[styles.competenciaNota, { color: getNotaColor(competencia.nota) }]}>
+                        {competencia.nota}
+                      </Text>
+                      <Ionicons
+                        name={expandedItems.has(competencia.id) ? "chevron-up" : "chevron-down"}
+                        size={20}
+                        color={Colors.textSecondary}
+                      />
+                    </View>
+                  </TouchableOpacity>
 
-                  {competencia.melhorias.length > 0 && (
-                    <View style={styles.melhoriasSection}>
-                      <Text style={styles.melhoriasTitle}>Pontos para melhorar:</Text>
-                      {competencia.melhorias.map((melhoria, index) => (
-                        <View key={index} style={styles.melhoriaItem}>
-                          <Ionicons name="bulb" size={16} color={Colors.primary} />
-                          <Text style={styles.melhoriaText}>{melhoria}</Text>
+                  {expandedItems.has(competencia.id) && (
+                    <View style={styles.competenciaExpanded}>
+                      <View style={styles.notaBadge}>
+                        <Text style={[styles.notaBadgeText, { color: getNotaColor(competencia.nota) }]}>
+                          {competencia.nota}/200 pontos
+                        </Text>
+                      </View>
+
+                      {competencia.nota === 200 && competencia.parabens && (
+                        <View style={styles.parabensSection}>
+                          <Ionicons name="trophy" size={24} color="#FFFFFF" />
+                          <Text style={styles.parabensText}>{competencia.parabens}</Text>
                         </View>
-                      ))}
+                      )}
+
+                      {competencia.melhorias.length > 0 && (
+                        <View style={styles.melhoriasSection}>
+                          <Text style={styles.melhoriasTitle}>Pontos para melhorar:</Text>
+                          {competencia.melhorias.map((melhoria, index) => (
+                            <View key={index} style={styles.melhoriaItem}>
+                              <Ionicons name="bulb" size={16} color="#FFFFFF" />
+                              <Text style={styles.melhoriaText}>{melhoria}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
                     </View>
                   )}
                 </View>
-              )}
-            </View>
-          ))}
+              ))}
             </>
           )}
 
@@ -292,13 +288,22 @@ export default function ResultsScreen() {
           {competencias.length > 0 && (
             <View style={styles.resumoSection}>
               <Text style={styles.resumoTitle}>Resumo Geral</Text>
-              <Text style={styles.resumoText}>
-                {redacao?.resultado_json?.competencias 
-                  ? redacao.resultado_json.competencias
-                      .map(c => c.justificativa)
-                      .join(" ")
-                  : "Sua redação demonstrou um bom domínio da linguagem, mas há oportunidades de melhoria na profundidade dos argumentos e na elaboração de propostas de intervenção mais concretas. Continue praticando para alcançar notas ainda maiores!"}
-              </Text>
+              {redacao?.resultado_json?.competencias
+                ? redacao.resultado_json.competencias.map((comp, index) => (
+                  <View key={index} style={styles.resumoBlock}>
+                    <Text style={styles.resumoBlockTitle}>
+                      Competência {comp.competencia}
+                    </Text>
+                    <Text style={styles.resumoText}>
+                      {comp.justificativa.replace(/\[Média C\d+\] /, "")}
+                    </Text>
+                  </View>
+                ))
+                : (
+                  <Text style={styles.resumoText}>
+                    Sua redação demonstrou um bom domínio da linguagem, mas há oportunidades de melhoria na profundidade dos argumentos e na elaboração de propostas de intervenção mais concretas. Continue praticando para alcançar notas ainda maiores!
+                  </Text>
+                )}
             </View>
           )}
 
@@ -375,7 +380,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   notaGeralValor: {
-    color: Colors.primary,
+    color: "#FFFFFF",
     fontSize: 48,
     fontWeight: "bold",
     marginBottom: 4,
@@ -445,10 +450,7 @@ const styles = StyleSheet.create({
   },
   notaBadge: {
     alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   notaBadgeText: {
     fontSize: 14,
@@ -457,14 +459,12 @@ const styles = StyleSheet.create({
   parabensSection: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFD70020",
-    padding: 12,
-    borderRadius: 8,
+    padding: 0,
     marginBottom: 16,
     gap: 8,
   },
   parabensText: {
-    color: "#FFD700",
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
     flex: 1,
@@ -491,18 +491,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   resumoSection: {
-    backgroundColor: Colors.primary + "15",
+    backgroundColor: Colors.cardBackground,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: Colors.primary + "30",
+    borderColor: Colors.border,
   },
   resumoTitle: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  resumoBlock: {
+    marginBottom: 16,
+    backgroundColor: Colors.cardBackground,
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  resumoBlockTitle: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 6,
+    textTransform: "uppercase",
   },
   resumoText: {
     color: Colors.text,

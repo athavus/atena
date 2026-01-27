@@ -10,10 +10,10 @@ export const Config = {
 
   // API
   API: {
-    // Para desenvolvimento local, use: "http://localhost:8000"
+    // Para desenvolvimento local, use: "http://192.168.15.5:8000"
     // Para produção, use: "https://api.atena.com.br"
-    BASE_URL: __DEV__ 
-      ? "http://localhost:8000"  // Desenvolvimento local
+    BASE_URL: __DEV__
+      ? "http://192.168.15.5:8000"  // Desenvolvimento local
       : "https://api.atena.com.br",  // Produção
   },
 

@@ -8,21 +8,26 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useEffect } from "react";
-import { router } from "expo-router";
+import { useState, useCallback } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../../components/Header";
 import { Colors } from "../../../constants/Colors";
+import { api, RedacaoStatus } from "../../../utils/api";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [userName, setUserName] = useState("Usuário");
   const [userEmail, setUserEmail] = useState("usuario@exemplo.com");
-  const [redacoesCorrigidas] = useState(0);
-  const [notaMedia] = useState(0);
+  const [redacoesCorrigidas, setRedacoesCorrigidas] = useState(0);
+  const [notaMedia, setNotaMedia] = useState(0);
 
-  useEffect(() => {
-    loadUserData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+      loadStats();
+    }, []),
+  );
 
   const loadUserData = async () => {
     try {
@@ -36,32 +41,38 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      "Sair da Conta",
-      "Tem certeza que deseja sair?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Sair",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem("@user_logged");
-              await AsyncStorage.removeItem("@user_email");
-              await AsyncStorage.removeItem("@user_name");
-              router.replace("/(routes)/login");
-            } catch (error) {
-              Alert.alert("Erro", "Erro ao fazer logout. Tente novamente.");
-            }
-          },
-        },
-      ],
-      { cancelable: true },
-    );
+  const loadStats = async () => {
+    try {
+      const redacoes = await api.listarRedacoes();
+      const concluidas = redacoes.filter(
+        (r) =>
+          r.status === RedacaoStatus.CONCLUIDO && r.resultado_json?.nota_final,
+      );
+
+      setRedacoesCorrigidas(concluidas.length);
+
+      if (concluidas.length > 0) {
+        const totalNota = concluidas.reduce(
+          (acc, curr) => acc + (curr.resultado_json?.nota_final || 0),
+          0,
+        );
+        setNotaMedia(totalNota / concluidas.length);
+      } else {
+        setNotaMedia(0);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar estatísticas:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    } finally {
+      router.replace("/(routes)/login");
+    }
   };
 
   return (
@@ -84,26 +95,38 @@ export default function ProfileScreen() {
 
         {/* Estatísticas */}
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Ionicons name="document-text" size={32} color={Colors.primary} />
+          <TouchableOpacity
+            style={styles.statCard}
+            onPress={() => router.push("/(routes)/(tabs)/history")}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="document-text" size={32} color="#FFFFFF" />
             <Text style={styles.statNumber}>{redacoesCorrigidas}</Text>
             <Text style={styles.statLabel}>Redações Corrigidas</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.statCard}>
-            <Ionicons name="star" size={32} color={Colors.primary} />
+          <TouchableOpacity
+            style={styles.statCard}
+            onPress={() => router.push("/(routes)/(tabs)/history")}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="star" size={32} color="#FFFFFF" />
             <Text style={styles.statNumber}>
-              {notaMedia > 0 ? notaMedia.toFixed(1) : "-"}
+              {notaMedia > 0 ? Math.round(notaMedia) : "-"}
             </Text>
             <Text style={styles.statLabel}>Nota Média</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Opções do Perfil */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Configurações</Text>
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => router.push("/(routes)/profile/edit")}
+          >
             <View style={styles.menuItemLeft}>
               <Ionicons name="person-outline" size={24} color={Colors.text} />
               <Text style={styles.menuItemText}>Editar Perfil</Text>
@@ -115,23 +138,11 @@ export default function ProfileScreen() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-            <View style={styles.menuItemLeft}>
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color={Colors.text}
-              />
-              <Text style={styles.menuItemText}>Notificações</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => router.push("/(routes)/profile/help")}
+          >
             <View style={styles.menuItemLeft}>
               <Ionicons
                 name="help-circle-outline"
@@ -152,7 +163,11 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Sobre</Text>
 
-          <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            activeOpacity={0.7}
+            onPress={() => router.push("/(routes)/profile/about")}
+          >
             <View style={styles.menuItemLeft}>
               <Ionicons
                 name="information-circle-outline"
@@ -175,12 +190,12 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={24} color="#FF6B6B" />
+          <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
           <Text style={styles.logoutButtonText}>Sair da Conta</Text>
         </TouchableOpacity>
 
         {/* Versão */}
-        <Text style={styles.versionText}>Versão 1.0.0</Text>
+        <Text style={styles.versionText}>Versão 0.6.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -289,10 +304,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     gap: 10,
     borderWidth: 1,
-    borderColor: "#FF6B6B",
+    borderColor: Colors.border, // Changed from Red margin to neutral border
   },
   logoutButtonText: {
-    color: "#FF6B6B",
+    color: "#FFFFFF", // Changed from Red to White
     fontSize: 16,
     fontWeight: "600",
   },

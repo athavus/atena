@@ -1,17 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import auth, redacoes
+from shared.models import Base, engine
+
+# Create tables on startup
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="API de Correção de Redação ENEM", version="1.0.0")
 
 # Lista de origens permitidas
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[],  # Disable explicit list in favor of regex for dev
-    allow_origin_regex=r"http://localhost(:\d+)?",  # Allow localhost with any port
-    allow_credentials=True,  # Permite cookies (se você usar)
-    allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
-    allow_headers=["*"],  # Permite todos os cabeçalhos
+    allow_origins=[],
+    allow_origin_regex=r"^https?://.*$",  # Permitir qualquer origem via regex para suportar credentials
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)

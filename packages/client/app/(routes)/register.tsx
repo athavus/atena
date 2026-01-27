@@ -61,25 +61,21 @@ export default function RegisterScreen() {
     try {
       // Criar conta na API
       await api.register({ email, password });
-      
+
       // Fazer login automaticamente após registro
       await api.login(email, password);
-      
+
       // Salvar dados do usuário no AsyncStorage
       await storage.setUserData(email, name);
       await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
 
       setIsLoading(false);
-      Alert.alert("Sucesso", "Conta criada com sucesso!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/(routes)/(tabs)/add"),
-        },
-      ]);
+      // Redirect immediately for seamless flow as requested
+      router.replace("/(routes)/(tabs)/add");
     } catch (error) {
       setIsLoading(false);
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "Erro ao criar conta. Tente novamente.";
       Alert.alert("Erro", errorMessage);
     }
@@ -98,7 +94,7 @@ export default function RegisterScreen() {
           {/* Botão Voltar */}
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() => router.replace("/(routes)/login")}
             activeOpacity={0.7}
             disabled={isLoading}
           >
@@ -260,7 +256,7 @@ export default function RegisterScreen() {
               <View style={styles.loginLinkContainer}>
                 <Text style={styles.loginLinkText}>Já tem uma conta? </Text>
                 <TouchableOpacity
-                  onPress={() => router.back()}
+                  onPress={() => router.replace("/(routes)/login")}
                   activeOpacity={0.7}
                   disabled={isLoading}
                 >
