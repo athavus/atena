@@ -34,36 +34,7 @@ Este documento explica todas as configurações necessárias para executar o pro
 
 ## Configuração do Backend (API)
 
-### 1. Criar arquivo `.env`
-
-No diretório `packages/api/`, crie um arquivo `.env` com o seguinte conteúdo:
-
-```env
-# Database
-DATABASE_URL=postgresql://admin:supersecret@db:5432/enem_correcoes_db
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=supersecret
-POSTGRES_DB=enem_correcoes_db
-
-# Autenticação JWT
-SECRET_KEY=sua_chave_secreta_super_segura_aqui_mude_em_producao
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Celery (Redis)
-CELERY_BROKER_URL=redis://redis:6379/0
-CELERY_RESULT_BACKEND=redis://redis:6379/0
-
-# LLM (Google Gemini)
-GOOGLE_API_KEY=sua_google_api_key_aqui
-LLM_PROVIDER=gemini
-LLM_MODEL=models/gemini-1.5-flash
-
-# Opcional: Perplexity (alternativa)
-PPLX_API_KEY=sua_perplexity_api_key_aqui
-```
-
-### 2. Gerar SECRET_KEY
+### 1. Gerar SECRET_KEY
 
 Para gerar uma chave secreta segura, você pode usar:
 
@@ -71,33 +42,17 @@ Para gerar uma chave secreta segura, você pode usar:
 python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-### 3. Obter Google API Key
+### 2. Obter Google API Key
 
 1. Acesse [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Crie uma nova API key
 3. Cole no arquivo `.env`
 
-### 4. Executar Migrações
-
-Após iniciar os containers, execute as migrações:
-
-```bash
-cd packages/api
-docker compose run --rm api alembic upgrade head
-```
-
 ---
 
 ## Configuração do Client (Mobile)
 
-### 1. Instalar Dependências
-
-```bash
-cd packages/client
-npm install
-```
-
-### 2. Configurar URL da API
+### 1. Configurar URL da API
 
 Edite o arquivo `packages/client/utils/config.tsx`:
 
@@ -117,7 +72,7 @@ API: {
 - **iOS Simulator**: Use `http://localhost:8000`
 - **Dispositivo físico**: Use o IP da sua máquina na rede local (ex: `http://192.168.1.100:8000`)
 
-### 3. Verificar Configuração de CORS
+### 2. Verificar Configuração de CORS
 
 Certifique-se de que o backend está configurado para aceitar requisições do client. No arquivo `packages/api/backend/main.py`, a configuração CORS deve permitir a origem do client:
 
@@ -336,4 +291,3 @@ Para problemas ou dúvidas:
 ---
 
 **Última atualização:** Janeiro 2025
-
