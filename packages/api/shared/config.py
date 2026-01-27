@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: Optional[str] = None
     PPLX_API_KEY: Optional[str] = None
     LLM_PROVIDER: str = "gemini"
-    LLM_MODEL: str = "models/gemini-1.5-flash"
+    LLM_MODEL: str = "gemini-2.0-flash"
 
     class Config:
         case_sensitive = True

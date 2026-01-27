@@ -16,7 +16,7 @@ async def extrair_texto_da_imagem_async(image_bytes: bytes) -> str:
     """
     try:
         # Usamos o modelo Flash para velocidade e visão
-        model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+        model = genai.GenerativeModel(model_name="gemini-2.0-flash")
         
         prompt = (
             "Você é um especialista em transcrição de manuscritos. "

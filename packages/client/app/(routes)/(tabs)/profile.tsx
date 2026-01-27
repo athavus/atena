@@ -365,7 +365,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* Versão */}
-        <Text style={styles.versionText}>Versão 0.7.1</Text>
+        <Text style={styles.versionText}>Versão 0.7.8</Text>
       </ScrollView>
     </SafeAreaView>
   );

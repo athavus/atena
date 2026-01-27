@@ -11,7 +11,7 @@ class RedacaoStatusEnum(str, Enum):
 
 
 class RedacaoCreate(BaseModel):
-    tema: str = Field(..., min_length=5, max_length=100)
+    tema: str = Field(..., min_length=5, max_length=200)
     texto_redacao: str = Field(..., min_length=300, max_length=5000)
 
 
@@ -25,7 +25,6 @@ class User(BaseModel):
     id: int
     email: str
     name: Optional[str] = None
-    profile_pic: Optional[bytes] = None
     
     class Config:
         from_attributes = True

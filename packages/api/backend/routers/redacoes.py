@@ -62,6 +62,25 @@ def criar_correcao(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
+    # Verificar limite diário de 5 redações
+    hoje = datetime.now().date()
+    amanha = hoje + timedelta(days=1)
+    
+    redacoes_hoje = db.query(models.Redacao).filter(
+        models.Redacao.user_id == current_user.id,
+        models.Redacao.criado_em >= hoje,
+        models.Redacao.criado_em < amanha
+    ).count()
+    
+    if redacoes_hoje >= 5:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Você atingiu o limite de 5 redações por dia. Tente novamente amanhã!"
+        )
+    
     db_redacao = models.Redacao(
         tema=redacao.tema, 
         texto_redacao=redacao.texto_redacao, 
@@ -77,7 +96,7 @@ def criar_correcao(
     return {
         "id": db_redacao.id,
         "status": RedacaoStatusEnum.PENDENTE,
-        "message": "Sua redação foi recebida e está na fila para correção.",
+        "message": f"Sua redação foi recebida e está na fila para correção. ({redacoes_hoje + 1}/5 redações hoje)",
     }
 
 

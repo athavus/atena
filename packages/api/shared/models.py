@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, JSON, ForeignKey, LargeBinary
+from sqlalchemy import create_engine, Column, Integer, String, Text, JSON, ForeignKey, LargeBinary, DateTime
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 from shared.config import settings
 
 DATABASE_URL = settings.DATABASE_URL
@@ -30,6 +31,7 @@ class Redacao(Base):
     status = Column(String, default="PENDENTE")
     resultado_json = Column(JSON, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    criado_em = Column(DateTime(timezone=True), server_default=func.now())
     
     owner = relationship("User", back_populates="redacoes")
 

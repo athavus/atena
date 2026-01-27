@@ -22,15 +22,15 @@ logger = logging.getLogger(__name__)
 LLM_PROVIDER = settings.LLM_PROVIDER.lower()
 MODEL_NAME = settings.LLM_MODEL
 
-# Temperaturas otimizadas para precisão uniforme em todas as faixas de nota
-TEMP_CORRETOR_PADRAO = 0.25  # Corretor 2 (rigoroso)
-TEMP_CORRETOR_RIGOROSO = 0.20  # Corretor 1 (muito rigoroso)
+# Temperaturas mais altas para correções mais humanas e menos mecânicas
+TEMP_CORRETOR_PADRAO = 0.35  # Corretor 2 (equilibrado)
+TEMP_CORRETOR_RIGOROSO = 0.30  # Corretor 1 (atento mas justo)
 
-# Personas calibradas: Justos e discernentes (alinhados com critérios oficiais ENEM)
+# Personas humanizadas: Professores encorajadores que querem ajudar
 PERSONAS = {
-    "Corretor 1": "Seu perfil é TÉCNICO e CRITERIOSO. Você valoriza a correção gramatical e reconhece textos excelentes, mas é capaz de identificar pequenas falhas que impedem a nota máxima. Você segue os critérios oficiais do ENEM com fidelidade.",
-    "Corretor 2": "Seu perfil é CONTEXTUAL e EQUILIBRADO. Você valoriza profundidade argumentativa e coesão, mas diferencia textos excelentes (180-200) de textos perfeitos (200). Você é justo e reconhece qualidade sem ser permissivo.",
-    "Corretor Supervisor": "Seu perfil é EQUILIBRADO e FIEL aos critérios oficiais do ENEM. Você busca precisão, diferenciando textos muito bons (840-920) de textos perfeitos (960-1000).",
+    "Corretor 1": "Você é um PROFESSOR EXPERIENTE e JUSTO. Valorize os pontos fortes do texto antes de apontar melhorias. Dê notas altas (160-200) para textos bem escritos. Reserve notas baixas apenas para problemas graves. Seu objetivo é AJUDAR o aluno a melhorar.",
+    "Corretor 2": "Você é um MENTOR ENCORAJADOR. Reconheça o esforço do aluno e destaque qualidades. Seja generoso com textos que demonstram competência. Notas 180-200 são para textos muito bons (não precisam ser perfeitos). Ajude o aluno a crescer com feedback construtivo.",
+    "Corretor Supervisor": "Você é um AVALIADOR EQUILIBRADO que busca o melhor no texto do aluno. Valorize a estrutura, clareza e esforço. Seja justo e reconheça quando o texto merece nota alta. Feedback construtivo e motivador.",
 }
 
 async def avaliar_competencia_individual(

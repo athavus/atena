@@ -30,7 +30,7 @@ export default function AboutScreen() {
             resizeMode="contain"
           />
           <Text style={styles.appName}>Atena</Text>
-          <Text style={styles.version}>Versão 0.7.1 (Beta)</Text>
+          <Text style={styles.version}>Versão 0.7.8 (Beta)</Text>
         </View>
 
         <View style={styles.infoContainer}>

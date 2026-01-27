@@ -22,7 +22,7 @@ import { api } from "../../../utils/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MIN_TITULO_LENGTH = 20;
-const MAX_TITULO_LENGTH = 100;
+const MAX_TITULO_LENGTH = 200;
 const MIN_TEXTO_LENGTH = 300;
 const MAX_TEXTO_LENGTH = 5000;
 
@@ -31,12 +31,6 @@ export default function AddScreen() {
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingTheme, setIsGeneratingTheme] = useState(false);
-  const [showThemeModal, setShowThemeModal] = useState(false);
-  const [suggestedTheme, setSuggestedTheme] = useState<{
-    tema: string;
-    textos_motivadores: string[];
-  } | null>(null);
 
   // Auto-save Draft
   useEffect(() => {
@@ -47,7 +41,7 @@ export default function AddScreen() {
             "atena_draft",
             JSON.stringify({ titulo, texto }),
           );
-        } catch (e) { }
+        } catch (e) {}
       };
       saveDraft();
     }
@@ -82,7 +76,7 @@ export default function AddScreen() {
             );
           }
         }
-      } catch (e) { }
+      } catch (e) {}
     };
     checkDraft();
   }, []);
@@ -141,30 +135,6 @@ export default function AddScreen() {
     }
   };
 
-  const handleGenerateTheme = async () => {
-    setIsGeneratingTheme(true);
-    try {
-      const suggestion = await api.getThemeSuggestion();
-      setSuggestedTheme(suggestion);
-      setShowThemeModal(true);
-    } catch (error) {
-      console.error("Erro ao gerar tema:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível gerar um tema. Tente novamente mais tarde.",
-      );
-    } finally {
-      setIsGeneratingTheme(false);
-    }
-  };
-
-  const useSuggestedTheme = () => {
-    if (suggestedTheme) {
-      setTitulo(suggestedTheme.tema);
-      setShowThemeModal(false);
-    }
-  };
-
   const podeEnviar =
     titulo.length >= MIN_TITULO_LENGTH &&
     titulo.length <= MAX_TITULO_LENGTH &&
@@ -192,28 +162,13 @@ export default function AddScreen() {
               <View style={styles.sectionHeader}>
                 <View style={styles.titleWithIcon}>
                   <Text style={styles.sectionTitle}>Título da Redação</Text>
-                  <TouchableOpacity
-                    onPress={handleGenerateTheme}
-                    disabled={isGeneratingTheme}
-                    style={styles.suggestionButton}
-                  >
-                    {isGeneratingTheme ? (
-                      <ActivityIndicator size="small" color={Colors.primary} />
-                    ) : (
-                      <Ionicons
-                        name="sparkles"
-                        size={18}
-                        color={Colors.primary}
-                      />
-                    )}
-                  </TouchableOpacity>
                 </View>
                 <Text
                   style={[
                     styles.countBadge,
                     titulo.length > 0 &&
-                    titulo.length < MIN_TITULO_LENGTH &&
-                    styles.countBadgeError,
+                      titulo.length < MIN_TITULO_LENGTH &&
+                      styles.countBadgeError,
                   ]}
                 >
                   {titulo.length}/{MAX_TITULO_LENGTH}
@@ -223,8 +178,8 @@ export default function AddScreen() {
                 style={[
                   styles.titleInput,
                   titulo.length > 0 &&
-                  titulo.length < MIN_TITULO_LENGTH &&
-                  styles.inputError,
+                    titulo.length < MIN_TITULO_LENGTH &&
+                    styles.inputError,
                 ]}
                 placeholder="Digite o título da sua redação..."
                 placeholderTextColor={Colors.textSecondary}
@@ -248,8 +203,8 @@ export default function AddScreen() {
                     style={[
                       styles.countBadge,
                       texto.length > 0 &&
-                      texto.length < MIN_TEXTO_LENGTH &&
-                      styles.countBadgeError,
+                        texto.length < MIN_TEXTO_LENGTH &&
+                        styles.countBadgeError,
                     ]}
                   >
                     {texto.length}/{MAX_TEXTO_LENGTH}
@@ -259,8 +214,8 @@ export default function AddScreen() {
                   style={[
                     styles.textInput,
                     texto.length > 0 &&
-                    texto.length < MIN_TEXTO_LENGTH &&
-                    styles.inputError,
+                      texto.length < MIN_TEXTO_LENGTH &&
+                      styles.inputError,
                   ]}
                   placeholder="Digite ou cole o texto da sua redação aqui (mínimo 300 caracteres)..."
                   placeholderTextColor={Colors.textSecondary}
@@ -331,58 +286,6 @@ export default function AddScreen() {
             )}
           </View>
         </ScrollView>
-
-        {/* Modal de Sugestão de Tema */}
-        <Modal
-          visible={showThemeModal}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowThemeModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Ionicons name="sparkles" size={24} color={Colors.primary} />
-                <Text style={styles.modalTitle}>Sugestão de Tema</Text>
-                <TouchableOpacity onPress={() => setShowThemeModal(false)}>
-                  <Ionicons
-                    name="close"
-                    size={24}
-                    color={Colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView
-                style={styles.modalScroll}
-                showsVerticalScrollIndicator={false}
-              >
-                <Text style={styles.suggestedThemeLabel}>Tema Proposto:</Text>
-                <Text style={styles.suggestedThemeText}>
-                  {suggestedTheme?.tema}
-                </Text>
-
-                <View style={styles.divider} />
-
-                <Text style={styles.suggestedThemeLabel}>
-                  Textos Motivadores:
-                </Text>
-                {suggestedTheme?.textos_motivadores.map((texto, index) => (
-                  <View key={index} style={styles.motivatorCard}>
-                    <Text style={styles.motivatorText}>{texto}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-
-              <TouchableOpacity
-                style={styles.useThemeButton}
-                onPress={useSuggestedTheme}
-              >
-                <Text style={styles.useThemeButtonText}>Usar este Tema</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -52,20 +52,27 @@ export default function ResultsScreen() {
       return [];
     }
 
-    return resultado.resultado_json.competencias.map((comp, index) => ({
-      id: comp.competencia,
-      titulo: `Competência ${comp.competencia}`,
-      nota: comp.nota,
-      descricao: COMPETENCIAS_DESC[comp.competencia - 1] || "",
-      analise: comp.analise_critica || "",
-      melhorias: comp.analise_critica
-        ? comp.analise_critica.split("\n").filter((m) => m.trim().length > 0 && m.includes("-"))
-        : [],
-      parabens:
-        comp.nota === 200
-          ? `Parabéns! Você demonstrou excelente habilidade na ${comp.competencia}ª competência!`
-          : "",
-    }));
+    return resultado.resultado_json.competencias.map((comp, index) => {
+      // Garantir que o número da competência é válido (1-5), senão usar índice
+      const numComp = comp.competencia >= 1 && comp.competencia <= 5
+        ? comp.competencia
+        : index + 1;
+
+      return {
+        id: index + 1, // Usar índice para ID único
+        titulo: `Competência ${numComp}`,
+        nota: comp.nota,
+        descricao: COMPETENCIAS_DESC[numComp - 1] || "",
+        analise: comp.analise_critica || "",
+        melhorias: comp.analise_critica
+          ? comp.analise_critica.split("\n").filter((m) => m.trim().length > 0 && m.includes("-"))
+          : [],
+        parabens:
+          comp.nota === 200
+            ? `Parabéns! Você demonstrou excelente habilidade na ${numComp}ª competência!`
+            : "",
+      };
+    });
   };
 
   // Função para buscar status da redação
@@ -174,15 +181,11 @@ export default function ResultsScreen() {
   };
 
   const getNotaBackground = (nota: number) => {
-    if (nota >= 180) return "rgba(74, 222, 128, 0.1)";
-    if (nota >= 120) return "rgba(251, 191, 36, 0.1)";
-    return "rgba(255, 107, 107, 0.1)";
+    return "rgba(255, 255, 255, 0.05)"; // Neutro para todos
   };
 
   const getNotaBorder = (nota: number) => {
-    if (nota >= 180) return "#4ADE80";
-    if (nota >= 120) return "#FBBF24";
-    return "#FF6B6B";
+    return Colors.border; // Borda neutra padrão
   };
 
   if (isLoading) {
