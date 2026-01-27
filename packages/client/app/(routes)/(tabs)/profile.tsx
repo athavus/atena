@@ -236,7 +236,7 @@ export default function ProfileScreen() {
               <Ionicons name="person" size={60} color={Colors.text} />
             )}
             <View style={styles.editBadge}>
-              <Ionicons name="pencil" size={16} color="#FFFFFF" />
+              <Ionicons name="pencil" size={16} color="#1a1a1a" />
             </View>
           </TouchableOpacity>
           <Text style={styles.userName}>{userName}</Text>
@@ -365,7 +365,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* Versão */}
-        <Text style={styles.versionText}>Versão 0.7.0</Text>
+        <Text style={styles.versionText}>Versão 0.7.1</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -410,13 +410,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     backgroundColor: Colors.primary,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3,
-    borderColor: Colors.background,
+    borderWidth: 2,
+    borderColor: "#1a1a1a", // Cor sólida escura para separar do avatar
   },
   userName: {
     color: Colors.text,
