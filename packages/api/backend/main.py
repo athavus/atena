@@ -5,15 +5,10 @@ from backend.routers import auth, redacoes
 app = FastAPI(title="API de Correção de Redação ENEM", version="1.0.0")
 
 # Lista de origens permitidas
-origins = [
-    "*",  # Permite todas as origens (Desenvolvimento)
-    # Em produção, especifique os domínios:
-    # "https://seusite.com",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Quais origens podem fazer requisições
+    allow_origins=[],  # Disable explicit list in favor of regex for dev
+    allow_origin_regex=r"http://localhost(:\d+)?",  # Allow localhost with any port
     allow_credentials=True,  # Permite cookies (se você usar)
     allow_methods=["*"],  # Permite todos os métodos (GET, POST, etc.)
     allow_headers=["*"],  # Permite todos os cabeçalhos
