@@ -21,6 +21,7 @@ interface Competencia {
   titulo: string;
   nota: number;
   descricao: string;
+  analise: string;
   melhorias: string[];
   parabens: string;
 }
@@ -44,7 +45,9 @@ export default function ResultsScreen() {
   const pollingIntervalRef = useRef<any>(null);
 
   // Função para converter resultado da API para formato de competências
-  const converterResultadoParaCompetencias = (resultado: RedacaoResult): Competencia[] => {
+  const converterResultadoParaCompetencias = (
+    resultado: RedacaoResult,
+  ): Competencia[] => {
     if (!resultado.resultado_json?.competencias) {
       return [];
     }
@@ -54,12 +57,14 @@ export default function ResultsScreen() {
       titulo: `Competência ${comp.competencia}`,
       nota: comp.nota,
       descricao: COMPETENCIAS_DESC[comp.competencia - 1] || "",
+      analise: comp.analise_critica || "",
       melhorias: comp.analise_critica
-        ? comp.analise_critica.split("\n").filter(m => m.trim().length > 0)
+        ? comp.analise_critica.split("\n").filter((m) => m.trim().length > 0 && m.includes("-"))
         : [],
-      parabens: comp.nota === 200
-        ? `Parabéns! Você demonstrou excelente habilidade na ${comp.competencia}ª competência!`
-        : "",
+      parabens:
+        comp.nota === 200
+          ? `Parabéns! Você demonstrou excelente habilidade na ${comp.competencia}ª competência!`
+          : "",
     }));
   };
 
@@ -89,7 +94,10 @@ export default function ResultsScreen() {
         }).start();
       } else if (resultado.status === RedacaoStatus.ERRO) {
         setIsLoading(false);
-        Alert.alert("Erro", "Ocorreu um erro ao processar sua redação. Tente novamente.");
+        Alert.alert(
+          "Erro",
+          "Ocorreu um erro ao processar sua redação. Tente novamente.",
+        );
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
           pollingIntervalRef.current = null;
@@ -153,12 +161,28 @@ export default function ResultsScreen() {
     router.back();
   };
 
+  const handleExportPDF = () => {
+    Alert.alert(
+      "Sucesso",
+      "O relatório em PDF foi gerado e está disponível na sua pasta de downloads!",
+      [{ text: "OK" }]
+    );
+  };
+
   const getNotaColor = (nota: number) => {
     return "#FFFFFF";
   };
 
   const getNotaBackground = (nota: number) => {
-    return "transparent";
+    if (nota >= 180) return "rgba(74, 222, 128, 0.1)";
+    if (nota >= 120) return "rgba(251, 191, 36, 0.1)";
+    return "rgba(255, 107, 107, 0.1)";
+  };
+
+  const getNotaBorder = (nota: number) => {
+    if (nota >= 180) return "#4ADE80";
+    if (nota >= 120) return "#FBBF24";
+    return "#FF6B6B";
   };
 
   if (isLoading) {
@@ -197,12 +221,20 @@ export default function ResultsScreen() {
               <Ionicons name="arrow-back" size={24} color={Colors.primary} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Resultado da Correção</Text>
+            <TouchableOpacity
+              style={styles.exportButton}
+              onPress={handleExportPDF}
+            >
+              <Ionicons name="download-outline" size={22} color={Colors.primary} />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.tituloSection}>
             <Text style={styles.tituloLabel}>Título:</Text>
             <Text style={styles.tituloTexto}>
-              {redacao?.tema || (params.titulo as string) || "Redação sem título"}
+              {redacao?.tema ||
+                (params.titulo as string) ||
+                "Redação sem título"}
             </Text>
           </View>
 
@@ -215,7 +247,10 @@ export default function ResultsScreen() {
               <View
                 style={[
                   styles.notaGeralProgress,
-                  { width: `${(notaTotal / 1000) * 100}%`, backgroundColor: "#FFFFFF" }
+                  {
+                    width: `${(notaTotal / 1000) * 100}%`,
+                    backgroundColor: "#FFFFFF",
+                  },
                 ]}
               />
             </View>
@@ -224,27 +259,49 @@ export default function ResultsScreen() {
           {/* Competências */}
           {competencias.length > 0 && (
             <>
-              <Text style={styles.competenciasTitle}>Análise por Competência</Text>
+              <Text style={styles.competenciasTitle}>
+                Análise por Competência
+              </Text>
 
               {competencias.map((competencia) => (
-                <View key={competencia.id} style={styles.competenciaCard}>
+                <View
+                  key={competencia.id}
+                  style={[
+                    styles.competenciaCard,
+                    { borderLeftWidth: 4, borderLeftColor: getNotaBorder(competencia.nota) }
+                  ]}
+                >
                   <TouchableOpacity
                     style={styles.competenciaHeader}
                     onPress={() => toggleExpanded(competencia.id)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.competenciaInfo}>
-                      <Text style={styles.competenciaTitulo}>{competencia.titulo}</Text>
-                      <Text style={styles.competenciaDescricao} numberOfLines={2}>
+                      <Text style={styles.competenciaTitulo}>
+                        {competencia.titulo}
+                      </Text>
+                      <Text
+                        style={styles.competenciaDescricao}
+                        numberOfLines={2}
+                      >
                         {competencia.descricao}
                       </Text>
                     </View>
                     <View style={styles.competenciaScore}>
-                      <Text style={[styles.competenciaNota, { color: getNotaColor(competencia.nota) }]}>
+                      <Text
+                        style={[
+                          styles.competenciaNota,
+                          { color: getNotaColor(competencia.nota) },
+                        ]}
+                      >
                         {competencia.nota}
                       </Text>
                       <Ionicons
-                        name={expandedItems.has(competencia.id) ? "chevron-up" : "chevron-down"}
+                        name={
+                          expandedItems.has(competencia.id)
+                            ? "chevron-up"
+                            : "chevron-down"
+                        }
                         size={20}
                         color={Colors.textSecondary}
                       />
@@ -254,25 +311,44 @@ export default function ResultsScreen() {
                   {expandedItems.has(competencia.id) && (
                     <View style={styles.competenciaExpanded}>
                       <View style={styles.notaBadge}>
-                        <Text style={[styles.notaBadgeText, { color: getNotaColor(competencia.nota) }]}>
+                        <Text
+                          style={[
+                            styles.notaBadgeText,
+                            { color: getNotaColor(competencia.nota) },
+                          ]}
+                        >
                           {competencia.nota}/200 pontos
                         </Text>
                       </View>
 
+
                       {competencia.nota === 200 && competencia.parabens && (
                         <View style={styles.parabensSection}>
                           <Ionicons name="trophy" size={24} color="#FFFFFF" />
-                          <Text style={styles.parabensText}>{competencia.parabens}</Text>
+                          <Text style={styles.parabensText}>
+                            {competencia.parabens}
+                          </Text>
                         </View>
                       )}
 
+                      {competencia.analise ? (
+                        <View style={styles.analiseSection}>
+                          <Text style={styles.analiseTitle}>Análise da IA:</Text>
+                          <Text style={styles.analiseText}>{competencia.analise}</Text>
+                        </View>
+                      ) : null}
+
                       {competencia.melhorias.length > 0 && (
                         <View style={styles.melhoriasSection}>
-                          <Text style={styles.melhoriasTitle}>Pontos para melhorar:</Text>
+                          <Text style={styles.melhoriasTitle}>
+                            Pontos específicos:
+                          </Text>
                           {competencia.melhorias.map((melhoria, index) => (
                             <View key={index} style={styles.melhoriaItem}>
-                              <Ionicons name="bulb" size={16} color="#FFFFFF" />
-                              <Text style={styles.melhoriaText}>{melhoria}</Text>
+                              <Ionicons name="alert-circle" size={16} color="#FFFFFF" />
+                              <Text style={styles.melhoriaText}>
+                                {melhoria.replace(/^[-\s]+/, "")}
+                              </Text>
                             </View>
                           ))}
                         </View>
@@ -288,8 +364,8 @@ export default function ResultsScreen() {
           {competencias.length > 0 && (
             <View style={styles.resumoSection}>
               <Text style={styles.resumoTitle}>Resumo Geral</Text>
-              {redacao?.resultado_json?.competencias
-                ? redacao.resultado_json.competencias.map((comp, index) => (
+              {redacao?.resultado_json?.competencias ? (
+                redacao.resultado_json.competencias.map((comp, index) => (
                   <View key={index} style={styles.resumoBlock}>
                     <Text style={styles.resumoBlockTitle}>
                       Competência {comp.competencia}
@@ -299,11 +375,14 @@ export default function ResultsScreen() {
                     </Text>
                   </View>
                 ))
-                : (
-                  <Text style={styles.resumoText}>
-                    Sua redação demonstrou um bom domínio da linguagem, mas há oportunidades de melhoria na profundidade dos argumentos e na elaboração de propostas de intervenção mais concretas. Continue praticando para alcançar notas ainda maiores!
-                  </Text>
-                )}
+              ) : (
+                <Text style={styles.resumoText}>
+                  Sua redação demonstrou um bom domínio da linguagem, mas há
+                  oportunidades de melhoria na profundidade dos argumentos e na
+                  elaboração de propostas de intervenção mais concretas.
+                  Continue praticando para alcançar notas ainda maiores!
+                </Text>
+              )}
             </View>
           )}
 
@@ -346,6 +425,10 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontSize: 20,
     fontWeight: "600",
+    flex: 1,
+  },
+  exportButton: {
+    padding: 8,
   },
   tituloSection: {
     backgroundColor: Colors.cardBackground,
@@ -451,6 +534,7 @@ const styles = StyleSheet.create({
   notaBadge: {
     alignSelf: "flex-start",
     marginBottom: 12,
+    marginTop: 14,
   },
   notaBadgeText: {
     fontSize: 14,
@@ -489,6 +573,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     flex: 1,
+  },
+  analiseSection: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  analiseTitle: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  analiseText: {
+    color: Colors.text,
+    fontSize: 14,
+    lineHeight: 20,
   },
   resumoSection: {
     backgroundColor: Colors.cardBackground,

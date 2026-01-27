@@ -43,8 +43,11 @@ export default function LoginScreen() {
       // Fazer login na API
       await api.login(email, password);
 
+      // Buscar dados do usuário logado
+      const user = await api.getMe();
+
       // Salvar dados do usuário no AsyncStorage
-      await storage.setUserData(email, email.split("@")[0]);
+      await storage.setUserData(user.email, user.email.split("@")[0], user.id);
       await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
 
       setIsLoading(false);

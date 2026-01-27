@@ -11,18 +11,21 @@ class RedacaoStatusEnum(str, Enum):
 
 
 class RedacaoCreate(BaseModel):
-    tema: str
-    texto_redacao: str
+    tema: str = Field(..., min_length=5, max_length=100)
+    texto_redacao: str = Field(..., min_length=300, max_length=5000)
 
 
 class UserCreate(BaseModel):
     email: str
     password: str
+    name: Optional[str] = None
 
 
 class User(BaseModel):
     id: int
     email: str
+    name: Optional[str] = None
+    profile_pic: Optional[bytes] = None
     
     class Config:
         from_attributes = True
@@ -57,3 +60,7 @@ class AvaliacaoCompetencia(BaseModel):
     analise_critica: str = Field(description="Análise detalhada dos erros encontrados e raciocínio antes da nota.")
     nota: int = Field(description="A nota para esta competência (0, 40, 80, 120, 160, ou 200)")
     justificativa: str = Field(description="A justificativa final resumida para a nota atribuída.")
+
+
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = None

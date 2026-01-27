@@ -13,6 +13,7 @@ RUN useradd -m appuser
 USER appuser
 
 COPY --chown=appuser:appuser ./shared /app/shared
+COPY --chown=appuser:appuser ./worker /app/worker
 COPY --chown=appuser:appuser ./backend /app/backend
 
 EXPOSE 8000

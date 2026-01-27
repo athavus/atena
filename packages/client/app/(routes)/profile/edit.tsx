@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../../components/Header";
 import { Colors } from "../../../constants/Colors";
 import { storage } from "../../../utils/config";
+import { api } from "../../../utils/api";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -44,15 +45,18 @@ export default function EditProfileScreen() {
 
     setIsLoading(true);
     try {
-      // Simula atualização na API (se tivesse endpoint)
-      // Por enquanto atualiza apenas local
-      await storage.setUserData(email, name);
+      // Atualiza o perfil no backend
+      const updatedUser = await api.updateProfile({ name });
+
+      // Atualiza localmente com os dados retornados do servidor
+      await storage.setUserData(updatedUser.email, updatedUser.name || name, updatedUser.id);
 
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!", [
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível atualizar o perfil.");
+      console.error("Erro ao atualizar perfil:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o perfil. Verifique sua conexão.");
     } finally {
       setIsLoading(false);
     }

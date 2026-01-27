@@ -60,13 +60,16 @@ export default function RegisterScreen() {
 
     try {
       // Criar conta na API
-      await api.register({ email, password });
+      await api.register({ email, password, name });
 
       // Fazer login automaticamente após registro
       await api.login(email, password);
 
+      // Buscar dados do usuário logado
+      const user = await api.getMe();
+
       // Salvar dados do usuário no AsyncStorage
-      await storage.setUserData(email, name);
+      await storage.setUserData(user.email, name, user.id);
       await AsyncStorage.setItem(Config.STORAGE.USER_LOGGED, "true");
 
       setIsLoading(false);

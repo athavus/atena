@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response, File, UploadFile
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -44,7 +44,11 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     hashed_password = get_password_hash(user.password)
-    new_user = models.User(email=user.email, hashed_password=hashed_password)
+    new_user = models.User(
+        email=user.email, 
+        hashed_password=hashed_password,
+        name=user.name
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -65,3 +69,59 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/me", response_model=schemas.User)
+def read_users_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+
+@router.patch("/profile", response_model=schemas.User)
+def update_profile(
+    profile_data: schemas.ProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if profile_data.name is not None:
+        current_user.name = profile_data.name
+    
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.post("/profile/photo")
+async def upload_profile_photo(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # Lê o conteúdo do arquivo
+    content = await file.read()
+    
+    # Atualiza o usuário
+    current_user.profile_pic = content
+    db.commit()
+    
+    return {"message": "Foto de perfil atualizada com sucesso"}
+
+
+@router.delete("/profile/photo")
+async def delete_profile_photo(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    current_user.profile_pic = None
+    db.commit()
+    return {"message": "Foto de perfil removida com sucesso"}
+
+
+@router.get("/profile/photo/{user_id}")
+async def get_profile_photo(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user or not user.profile_pic:
+        # Se não houver foto, podemos retornar um 404 ou um placeholder
+        # Aqui, vamos lançar 404 para o app tratar
+        raise HTTPException(status_code=404, detail="Foto não encontrada")
+    
+    return Response(content=user.profile_pic, media_type="image/jpeg")

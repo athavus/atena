@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, JSON, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Text, JSON, ForeignKey, LargeBinary
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from shared.config import settings
@@ -15,6 +15,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    name = Column(String, nullable=True)
+    profile_pic = Column(LargeBinary, nullable=True)
 
     redacoes = relationship("Redacao", back_populates="owner")
 

@@ -2,16 +2,36 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constants/Colors";
+import { useState, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
+import { storage, Config } from "../utils/config";
 
 export default function Header() {
   const router = useRouter();
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserPhoto();
+    }, [])
+  );
+
+  const loadUserPhoto = async () => {
+    const data = await storage.getUserData();
+    if (data.id) {
+      // Usamos timestamp para evitar cache de imagem antiga
+      setProfilePhoto(`${Config.API.BASE_URL}/profile/photo/${data.id}?t=${Date.now()}`);
+    } else {
+      setProfilePhoto(null);
+    }
+  };
 
   const handleProfilePress = () => {
     router.push("/(routes)/(tabs)/profile");
   };
 
   const handleLogoPress = () => {
-    router.push("/(routes)/(tabs)/add");
+    router.push("/(routes)/(tabs)/home");
   };
 
   return (
@@ -35,11 +55,21 @@ export default function Header() {
           onPress={handleProfilePress}
           activeOpacity={0.7}
         >
-          <Ionicons
-            name="person-circle-outline"
-            size={28}
-            color={Colors.text}
-          />
+          {profilePhoto ? (
+            <View style={styles.photoWrapper}>
+              <Image
+                source={{ uri: profilePhoto }}
+                style={styles.profilePhoto}
+                onError={() => setProfilePhoto(null)}
+              />
+            </View>
+          ) : (
+            <Ionicons
+              name="person-circle-outline"
+              size={28}
+              color={Colors.text}
+            />
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -65,7 +95,21 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 4,
     position: "absolute",
-    right: 20,
+    right: 16, // Adjusted slightly
+  },
+  photoWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profilePhoto: {
+    width: "100%",
+    height: "100%",
   },
   logoContainer: {
     flexDirection: "row",

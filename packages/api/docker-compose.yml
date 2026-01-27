@@ -33,6 +33,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./shared:/app/shared
+      - ./worker:/app/worker
     ports:
       - "8000:8000"
     environment:

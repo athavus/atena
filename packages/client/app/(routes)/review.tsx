@@ -11,10 +11,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "../../components/Header";
 import { Colors } from "../../constants/Colors";
+import { api } from "../../utils/api";
 
 export default function ReviewScreen() {
   const router = useRouter();
@@ -23,22 +25,40 @@ export default function ReviewScreen() {
     (params.texto as string) || "",
   );
   const [titulo, setTitulo] = useState((params.titulo as string) || "");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirmar = () => {
-    if (textoExtraido.trim().length === 0) {
-      Alert.alert("Erro", "Por favor, revise o texto antes de confirmar.");
+  const handleConfirmar = async () => {
+    if (textoExtraido.trim().length < 300) {
+      Alert.alert("Erro", "A redação precisa ter pelo menos 300 caracteres.");
       return;
     }
 
-    // Navegar para tela de resultados com os dados
-    router.push({
-      pathname: "/(routes)/results",
-      params: {
-        titulo: titulo,
-        texto: textoExtraido,
-        tipo: "ocr",
-      },
-    });
+    if (!titulo.trim()) {
+      Alert.alert("Erro", "Por favor, defina um título para a redação.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Cria a redação real
+      const response = await api.criarRedacao({
+        tema: titulo,
+        texto_redacao: textoExtraido,
+      });
+
+      // Navegar para tela de resultados com o ID REAL
+      router.push({
+        pathname: "/(routes)/results",
+        params: {
+          redacaoId: response.id.toString(),
+          titulo: titulo,
+        },
+      });
+    } catch (error: any) {
+      Alert.alert("Erro", error.message || "Falha ao enviar redação.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVoltar = () => {
@@ -120,30 +140,36 @@ export default function ReviewScreen() {
                 styles.actionButton,
                 styles.confirmButton,
                 textoExtraido.trim().length === 0 &&
-                  styles.confirmButtonDisabled,
+                styles.confirmButtonDisabled,
               ]}
               onPress={handleConfirmar}
-              disabled={textoExtraido.trim().length === 0}
+              disabled={textoExtraido.trim().length === 0 || isLoading}
               activeOpacity={0.8}
             >
-              <Ionicons
-                name="checkmark"
-                size={20}
-                color={
-                  textoExtraido.trim().length > 0
-                    ? Colors.background
-                    : Colors.textSecondary
-                }
-              />
-              <Text
-                style={[
-                  styles.confirmButtonText,
-                  textoExtraido.trim().length === 0 &&
-                    styles.confirmButtonTextDisabled,
-                ]}
-              >
-                Confirmar
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color={Colors.background} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={
+                      textoExtraido.trim().length > 0
+                        ? Colors.background
+                        : Colors.textSecondary
+                    }
+                  />
+                  <Text
+                    style={[
+                      styles.confirmButtonText,
+                      textoExtraido.trim().length === 0 &&
+                      styles.confirmButtonTextDisabled,
+                    ]}
+                  >
+                    Confirmar
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </View>

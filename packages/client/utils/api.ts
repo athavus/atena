@@ -1,10 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { Config } from "./config";
 
 // Tipos para as respostas da API
 export interface User {
   id: number;
   email: string;
+  name?: string;
 }
 
 export interface TokenResponse {
@@ -15,6 +17,7 @@ export interface TokenResponse {
 export interface UserCreate {
   email: string;
   password: string;
+  name?: string;
 }
 
 export interface RedacaoCreate {
@@ -39,6 +42,7 @@ export interface RedacaoResult {
   id: number;
   status: RedacaoStatus;
   tema: string;
+  criado_em: string;
   resultado_json?: {
     nota_final?: number;
     competencias?: Array<{
@@ -100,7 +104,7 @@ async function request<T>(
 
   // Adiciona token de autenticação se disponível
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    (headers as any)["Authorization"] = `Bearer ${token}`;
   }
 
   try {
@@ -115,13 +119,14 @@ async function request<T>(
       const errorData = await response.json().catch(() => ({
         detail: response.statusText || "Erro desconhecido",
       }));
-      
+
       // Se for erro de autenticação, limpa o token
       if (response.status === 401) {
         await removeToken();
+        router.replace("/(routes)/login");
         throw new Error("Sessão expirada. Faça login novamente.");
       }
-      
+
       throw new Error(errorData.detail || `Erro ${response.status}`);
     }
 
@@ -151,22 +156,23 @@ export const api = {
     });
   },
 
+  async getMe(): Promise<User> {
+    return request<User>("/me");
+  },
+
   async login(email: string, password: string): Promise<TokenResponse> {
     // OAuth2 password flow usa form data
     const formData = new URLSearchParams();
     formData.append("username", email);
     formData.append("password", password);
 
-    const token = await getToken();
     const url = `${Config.API.BASE_URL}/token`;
-
-    const headers: HeadersInit = {
-      "Content-Type": "application/x-www-form-urlencoded",
-    };
 
     const response = await fetch(url, {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
       body: formData.toString(),
     });
 
@@ -188,6 +194,7 @@ export const api = {
       Config.STORAGE.USER_LOGGED,
       Config.STORAGE.USER_EMAIL,
       Config.STORAGE.USER_NAME,
+      Config.STORAGE.USER_ID,
     ]);
   },
 
@@ -213,5 +220,86 @@ export const api = {
   async obterRedacao(id: number): Promise<RedacaoResult> {
     return request<RedacaoResult>(`/api/v1/redacoes/${id}`);
   },
-};
 
+  async deletarRedacao(id: number): Promise<void> {
+    await request<void>(`/api/v1/redacoes/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Perfil / Fotos
+  async uploadProfilePhoto(uri: string): Promise<any> {
+    const token = await getToken();
+    const url = `${Config.API.BASE_URL}/profile/photo`;
+
+    const formData = new FormData();
+    // No React Native, campos de arquivo no FormData precisam de um objeto especial
+    formData.append("file", {
+      uri,
+      name: "profile.jpg",
+      type: "image/jpeg",
+    } as any);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: NÃO defina Content-Type manualmente aqui, o fetch fará isso para multipart/form-data
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        detail: response.statusText,
+      }));
+      throw new Error(errorData.detail || `Erro ${response.status}`);
+    }
+
+    return await response.json();
+  },
+
+  async deleteProfilePhoto(): Promise<any> {
+    return request<any>("/profile/photo", {
+      method: "DELETE",
+    });
+  },
+
+  async updateProfile(data: { name: string }): Promise<User> {
+    return request<User>("/profile", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getThemeSuggestion(): Promise<{ tema: string; textos_motivadores: string[] }> {
+    return request<{ tema: string; textos_motivadores: string[] }>("/api/v1/redacoes/sugestao-tema");
+  },
+
+  async extractTextFromImage(uri: string): Promise<{ texto: string }> {
+    const token = await getToken();
+    const url = `${Config.API.BASE_URL}/api/v1/redacoes/extract-text`;
+
+    const formData = new FormData();
+    formData.append("file", {
+      uri,
+      name: "handwriting.jpg",
+      type: "image/jpeg",
+    } as any);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Erro ao transcrever imagem.");
+    }
+
+    return response.json();
+  },
+};

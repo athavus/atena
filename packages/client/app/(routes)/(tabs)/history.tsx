@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -70,6 +71,29 @@ export default function HistoryScreen() {
         titulo: redacao.tema,
       },
     });
+  };
+
+  const handleDelete = (id: number) => {
+    Alert.alert(
+      "Excluir Redação",
+      "Tem certeza que deseja excluir esta redação do seu histórico?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await api.deletarRedacao(id);
+              // Atualiza o estado localmente sem refazer fetch
+              setRedacoes(prev => prev.filter(r => r.id !== id));
+            } catch (error) {
+              Alert.alert("Erro", "Não foi possível excluir a redação.");
+            }
+          }
+        }
+      ]
+    );
   };
 
   if (isLoading) {
@@ -172,6 +196,12 @@ export default function HistoryScreen() {
                       </View>
                     )}
                   <View style={styles.redacaoFooter}>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleDelete(redacao.id)}
+                    >
+                      <Ionicons name="trash-outline" size={18} color="#FF6B6B" />
+                    </TouchableOpacity>
                     <Ionicons
                       name="chevron-forward"
                       size={20}
@@ -281,8 +311,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   redacaoFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "flex-end",
     marginTop: 8,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: -8,
   },
   headerColumn: {
     marginBottom: 20,
