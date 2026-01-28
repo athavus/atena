@@ -108,11 +108,17 @@ async function request<T>(
     (headers as any)["Authorization"] = `Bearer ${token}`;
   }
 
+  // Timeout de 10 segundos para evitar requisições infinitas
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
   try {
     const response = await fetch(url, {
       ...options,
       headers,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     // Tratamento de erros HTTP
     if (!response.ok) {
@@ -138,8 +144,13 @@ async function request<T>(
 
     return await response.json();
   } catch (error) {
+    clearTimeout(timeoutId);
     // Re-lança erros conhecidos
     if (error instanceof Error) {
+      // Erro de timeout
+      if (error.name === 'AbortError') {
+        throw new Error("Servidor não respondeu. Verifique sua conexão ou tente novamente.");
+      }
       throw error;
     }
     // Erro de rede ou desconhecido
@@ -315,3 +326,4 @@ export const api = {
     return response.json();
   },
 };
+
