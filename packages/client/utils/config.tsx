@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
 
 export const Config = {
   // AsyncStorage keys
@@ -10,18 +9,13 @@ export const Config = {
     USER_ID: "@user_id",
   },
 
-  // API
   API: {
-    // Para desenvolvimento local, use: "http://192.168.15.2:8000"
-    // Para produção, use: "https://api.atena.com.br"
-    BASE_URL: __DEV__
-      ? "http://192.168.15.2:8000" // IP fixo para garantir que mobile e web se falem
-      : "https://api.atena.com.br", // Produção
+    BASE_URL: process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000",
   },
 
   // App
   APP: {
-    VERSION: "1.0.0",
+    VERSION: "0.7.8",
     NAME: "Atena",
   },
 
