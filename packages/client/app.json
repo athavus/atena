@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "atenaapp",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.atena",
@@ -26,7 +26,10 @@
         "barStyle": "light-content",
         "visible": true
       },
-      "package": "com.anonymous.atena"
+      "package": "com.anonymous.atena",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -54,6 +57,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dcb2ecae-161f-4356-9c49-1f151a8baaf2"
+      }
+    },
+    "owner": "athavus"
   }
 }
