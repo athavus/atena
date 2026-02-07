@@ -181,14 +181,6 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleExportData = () => {
-    Alert.alert(
-      "Exportar Dados",
-      "Seus dados (redações e resultados) foram exportados com sucesso em formato JSON.",
-      [{ text: "OK" }],
-    );
-  };
-
   const showPhotoOptions = () => {
     Alert.alert(
       "Foto de Perfil",
@@ -280,26 +272,6 @@ export default function ProfileScreen() {
             <View style={styles.menuItemLeft}>
               <Ionicons name="person-outline" size={24} color={Colors.text} />
               <Text style={styles.menuItemText}>Editar Perfil</Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={Colors.textSecondary}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.menuItem}
-            activeOpacity={0.7}
-            onPress={handleExportData}
-          >
-            <View style={styles.menuItemLeft}>
-              <Ionicons
-                name="cloud-download-outline"
-                size={24}
-                color={Colors.text}
-              />
-              <Text style={styles.menuItemText}>Exportar Dados</Text>
             </View>
             <Ionicons
               name="chevron-forward"
