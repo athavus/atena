@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -42,7 +42,10 @@ export default function AboutScreen() {
         </View>
 
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Linking.openURL("https://atena-privacy-terms.vercel.app/")}
+          >
             <Text style={styles.menuText}>Termos de Uso</Text>
             <Ionicons
               name="chevron-forward"
@@ -50,7 +53,10 @@ export default function AboutScreen() {
               color={Colors.textSecondary}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Linking.openURL("https://atena-privacy-terms.vercel.app/")}
+          >
             <Text style={styles.menuText}>Política de Privacidade</Text>
             <Ionicons
               name="chevron-forward"
