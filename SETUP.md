@@ -72,20 +72,6 @@ API: {
 - **iOS Simulator**: Use `http://localhost:8000`
 - **Dispositivo físico**: Use o IP da sua máquina na rede local (ex: `http://192.168.1.100:8000`)
 
-### 2. Verificar Configuração de CORS
-
-Certifique-se de que o backend está configurado para aceitar requisições do client. No arquivo `packages/api/backend/main.py`, a configuração CORS deve permitir a origem do client:
-
-```python
-origins = [
-    "http://localhost:8081",  # Expo dev server
-    "exp://192.168.1.100:8081",  # Expo em dispositivo físico
-    # Adicione outras origens conforme necessário
-]
-```
-
----
-
 ## Configuração do Privacy Terms
 
 ### 1. Instalar Dependências
